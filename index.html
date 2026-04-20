@@ -344,6 +344,36 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 .cal-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin:1px}
 .cal-entry-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:.88rem}
 .cal-entry-row:last-child{border-bottom:none}
+/* ── Split / Dividir ── */
+.split-toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem;color:var(--muted);font-weight:700;margin-top:10px;user-select:none}
+.split-toggle input{accent-color:var(--pri);width:15px;height:15px;cursor:pointer}
+.split-section{margin-top:10px;background:#f0f4ff;border-radius:10px;padding:14px;border:1.5px solid #bee3f8}
+.split-people{display:flex;flex-direction:column;gap:6px}
+.split-person-row{display:flex;gap:6px;align-items:center}
+.split-person-row input{flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem}
+.split-person-row button{background:none;border:none;color:var(--r);cursor:pointer;font-size:1.1rem;padding:4px}
+.split-preview{margin-top:10px;background:#fff;border-radius:8px;padding:10px;border:1px solid #bee3f8}
+.split-preview .sp-lbl{font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.split-preview .sp-mine{font-size:1.1rem;font-weight:800;color:var(--pri)}
+.split-preview .sp-debt{font-size:.8rem;color:var(--text);margin-top:4px;line-height:1.6}
+.split-preview .sp-debt span{background:#e9f5ff;border-radius:6px;padding:1px 7px;margin-right:4px;font-weight:600;color:var(--b)}
+/* Dividir tab */
+.div-people-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.div-person-chip{background:#e9f5ff;border-radius:20px;padding:5px 14px;font-size:.82rem;font-weight:700;color:var(--pri2);display:flex;align-items:center;gap:6px}
+.div-person-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;line-height:1}
+.div-expense-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.div-exp-row{background:#f7fafc;border-radius:10px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:1px solid var(--bdr)}
+.div-exp-row .de-desc{font-weight:700;flex:1;min-width:120px}
+.div-exp-row .de-amt{color:var(--pri);font-weight:800}
+.div-exp-row .de-paid{font-size:.78rem;color:var(--muted)}
+.div-exp-row .de-del{background:none;border:none;color:var(--r);cursor:pointer;margin-left:auto}
+.settlement-card{background:#fff;border-radius:12px;padding:16px;border:1.5px solid var(--g);margin-top:4px}
+.settle-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr);font-size:.88rem}
+.settle-row:last-child{border-bottom:none}
+.settle-from{font-weight:700;color:var(--r)}
+.settle-to{font-weight:700;color:var(--g)}
+.settle-amt{font-weight:800;color:var(--pri);margin-left:auto}
+.settle-empty{color:var(--muted);font-size:.88rem;text-align:center;padding:12px}
 .sync-badge{font-size:.72rem;padding:2px 8px;border-radius:12px;font-weight:600;white-space:nowrap}
 .sync-ok{background:#c6f6d5;color:#276749}
 .sync-pending{background:#fefcbf;color:#744210}
@@ -362,6 +392,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     <div class="nt" onclick="tab('cal',this)">📅 Calendario</div>
     <div class="nt" onclick="tab('savings',this)">🎯 Plan de Ahorro</div>
     <div class="nt" onclick="tab('cuotas',this)">🗂️ Cuotas</div>
+    <div class="nt" onclick="tab('dividir',this)">🤝 Dividir</div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
     <!-- Live rate badge -->
@@ -600,6 +631,22 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
         <input type="text" id="eDesc" placeholder="Ej: YPF, Jumbo, La Cabrera…" style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem">
       </div>
     </div>
+    <!-- Gasto compartido toggle -->
+    <label class="split-toggle">
+      <input type="checkbox" id="eSplitToggle" onchange="toggleSplitSection()">
+      🤝 Gasto compartido (dividir entre varios)
+    </label>
+    <div id="splitSection" style="display:none">
+      <div class="split-section">
+        <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">PARTICIPANTES</div>
+        <div class="split-people" id="splitPeopleList"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <input type="text" id="splitNewName" placeholder="Nombre…" style="flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem" onkeydown="if(event.key==='Enter'){addSplitPerson();event.preventDefault()}">
+          <button class="btn btn-g" onclick="addSplitPerson()" style="padding:6px 12px;font-size:.82rem">＋</button>
+        </div>
+        <div id="splitPreview"></div>
+      </div>
+    </div>
   </div>
   <!-- Search / filter bar -->
   <div class="search-bar">
@@ -683,6 +730,45 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 </div>
 
 </div><!-- /main -->
+
+<!-- ══════ DIVIDIR ══════ -->
+<div id="pane-dividir" class="pane">
+  <div class="card">
+    <div class="ct">🤝 Calculadora de gastos compartidos</div>
+    <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">Cargá los gastos del grupo y te digo quién le debe cuánto a quién para quedar todos empatados.</p>
+
+    <!-- Participantes -->
+    <div style="margin-bottom:16px">
+      <div class="ct" style="font-size:.75rem;margin-bottom:8px">👥 Participantes</div>
+      <div class="div-people-list" id="divPeopleList"></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input type="text" id="divNewPerson" placeholder="Nombre del participante…" style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem" onkeydown="if(event.key==='Enter'){divAddPerson();event.preventDefault()}">
+        <button class="btn btn-g" onclick="divAddPerson()">＋ Agregar</button>
+      </div>
+    </div>
+
+    <!-- Cargar un gasto -->
+    <div style="margin-bottom:16px;background:#f7fafc;border-radius:10px;padding:14px;border:1px solid var(--bdr)">
+      <div class="ct" style="font-size:.75rem;margin-bottom:10px">💸 Nuevo gasto</div>
+      <div class="row" style="gap:10px">
+        <div class="field"><label>Descripción</label><input type="text" id="divExpDesc" placeholder="Ej: Padel, Cena, Nafta…" style="width:160px"></div>
+        <div class="field"><label>Monto total</label><input type="number" id="divExpAmt" placeholder="0" min="0" style="width:110px" oninput="divPreviewParts()"></div>
+        <div class="field"><label>¿Quién pagó?</label><select id="divExpPaidBy" style="width:130px"></select></div>
+        <div class="field"><label>¿Quién participó?</label>
+          <div id="divExpParticipants" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px 0"></div>
+        </div>
+      </div>
+      <div id="divExpPreview" style="margin-top:8px;font-size:.8rem;color:var(--muted)"></div>
+      <button class="btn btn-g" onclick="divAddExpense()" style="margin-top:10px">＋ Agregar gasto</button>
+    </div>
+
+    <!-- Lista de gastos cargados -->
+    <div id="divExpenseList" style="margin-bottom:16px"></div>
+
+    <!-- Resultado -->
+    <div id="divSettlement"></div>
+  </div>
+</div>
 
 <!-- ══════ CUOTAS ══════ -->
 <div id="pane-cuotas" class="pane">
@@ -946,7 +1032,8 @@ async function loadS(){
     const r=await fetch('/api/state');
     if(r.ok){
       const data=await r.json();
-      if(data){
+      // Ignorar estado vacío {} — usar defaults en ese caso
+      if(data && data.currentMonth){
         if(!data.settings)data.settings=defaultSettings();
         if(!data.cuotas)data.cuotas=[];
         setSyncBadge('ok');
@@ -1130,6 +1217,7 @@ function tab(name,el){
   if(name==='cal')renderCal();
   if(name==='savings')renderSavings();
   if(name==='cuotas')renderCuotas();
+  if(name==='dividir')renderDividir();
 }
 
 // ═══════════════════════════ DASHBOARD ═══════════════════════════
@@ -1509,23 +1597,68 @@ function filterEntryLines(){
     lines.map(b=>`<option value="${b.id}">${esc(b.description)}</option>`).join('');
 }
 
+// ═══════════════ SPLIT EN FORM DE GASTOS ═══════════════
+let _splitPeople=['Yo'];
+function toggleSplitSection(){
+  const on=document.getElementById('eSplitToggle').checked;
+  document.getElementById('splitSection').style.display=on?'block':'none';
+  if(on){_splitPeople=['Yo'];renderSplitPeople();renderSplitPreview();}
+}
+function renderSplitPeople(){
+  const list=document.getElementById('splitPeopleList');if(!list)return;
+  list.innerHTML=_splitPeople.map((p,i)=>`
+    <div class="split-person-row">
+      <input value="${p}" oninput="_splitPeople[${i}]=this.value;renderSplitPreview()" style="flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem">
+      ${i>0?`<button onclick="_splitPeople.splice(${i},1);renderSplitPeople();renderSplitPreview()" style="background:none;border:none;color:var(--r);cursor:pointer;font-size:1.1rem">✕</button>`:'<span style="width:24px"></span>'}
+    </div>`).join('');
+}
+function addSplitPerson(){
+  const inp=document.getElementById('splitNewName');
+  const name=inp.value.trim();if(!name)return;
+  _splitPeople.push(name);inp.value='';
+  renderSplitPeople();renderSplitPreview();
+}
+function renderSplitPreview(){
+  const prev=document.getElementById('splitPreview');if(!prev)return;
+  const total=parseFloat(document.getElementById('eAmt').value)||0;
+  const people=_splitPeople.filter(p=>p.trim());
+  if(!people.length||!total){prev.innerHTML='';return;}
+  const perHead=total/people.length;
+  const others=people.slice(1).filter(p=>p.trim());
+  prev.innerHTML=`<div class="split-preview">
+    <div class="sp-lbl">Resultado</div>
+    <div class="sp-mine">Tu parte: ${fmt(perHead)}</div>
+    ${others.length?`<div class="sp-debt">Te deben: ${others.map(p=>`<span>${p}: ${fmt(perHead)}</span>`).join('')}</div>`:''}
+    <div style="font-size:.7rem;color:var(--muted);margin-top:4px">El gasto que se registra es tu parte (${fmt(perHead)}) sobre el total de ${fmt(total)}</div>
+  </div>`;
+}
+
 function addEntry(){
   const date=document.getElementById('eDate').value;
   const cat=document.getElementById('eCat').value;
   const lineId=document.getElementById('eLine').value;
-  const amt=parseFloat(document.getElementById('eAmt').value)||0;
+  const totalAmt=parseFloat(document.getElementById('eAmt').value)||0;
   const desc=document.getElementById('eDesc').value.trim();
   if(!date){alert('Seleccioná una fecha');return;}
-  if(amt<=0){alert('Ingresá un monto mayor a 0');return;}
-  // determine monthKey from date
+  if(totalAmt<=0){alert('Ingresá un monto mayor a 0');return;}
   const mk=date.substring(0,7);
   if(!S.months[mk]){alert(`No existe presupuesto para el mes ${mk}. Creá el mes primero desde la pestaña Presupuesto.`);return;}
   const currentRate=getCurrentUSDRate();
-  S.dailyEntries.push({id:uid(),date,monthKey:mk,cat,description:desc||document.getElementById('eLine').options[document.getElementById('eLine').selectedIndex]?.text||cat,amount:amt,budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate});
+  const isSplit=document.getElementById('eSplitToggle').checked;
+  const people=isSplit?_splitPeople.filter(p=>p.trim()):null;
+  const myAmt=isSplit&&people&&people.length>1?totalAmt/people.length:totalAmt;
+  const entryDesc=desc||document.getElementById('eLine').options[document.getElementById('eLine').selectedIndex]?.text||cat;
+  const entry={id:uid(),date,monthKey:mk,cat,description:entryDesc,amount:myAmt,budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate};
+  if(isSplit&&people&&people.length>1){
+    entry.split={total:totalAmt,people,myShare:myAmt};
+  }
+  S.dailyEntries.push(entry);
   document.getElementById('eAmt').value='';
   document.getElementById('eDesc').value='';
+  document.getElementById('eSplitToggle').checked=false;
+  document.getElementById('splitSection').style.display='none';
+  _splitPeople=['Yo'];
   saveS();renderDaily();
-  // also refresh budget if visible
   if(document.getElementById('pane-budget').classList.contains('active'))renderBudget();
 }
 
@@ -2502,6 +2635,147 @@ function renderCalDayDetail(ds){
   detail.style.display='block';
   document.getElementById('calDayEntries').innerHTML=
     rows+`<div style="display:flex;justify-content:flex-end;padding-top:8px;font-weight:800;font-size:.95rem">Total: ${fmt(total)}</div>`;
+}
+
+// ═══════════════════ CALCULADORA DIVIDIR (tab) ═══════════════════
+let _divPeople=[];   // ['Franco','Nico','Damian']
+let _divExpenses=[]; // [{id,desc,amount,paidBy,participants:[...]}]
+
+function divAddPerson(){
+  const inp=document.getElementById('divNewPerson');
+  const name=inp.value.trim();if(!name)return;
+  if(_divPeople.includes(name))return;
+  _divPeople.push(name);
+  inp.value='';
+  renderDividir();
+}
+
+function divRemovePerson(name){
+  _divPeople=_divPeople.filter(p=>p!==name);
+  // limpia gastos que la tenían como única participante
+  _divExpenses=_divExpenses.map(e=>({...e,participants:e.participants.filter(p=>p!==name)}))
+    .filter(e=>e.participants.length>0);
+  renderDividir();
+}
+
+function divAddExpense(){
+  const desc=document.getElementById('divExpDesc').value.trim();
+  const amt=parseFloat(document.getElementById('divExpAmt').value)||0;
+  const paidBy=document.getElementById('divExpPaidBy').value;
+  const participants=Array.from(document.querySelectorAll('#divExpParticipants input:checked')).map(cb=>cb.value);
+  if(!desc){alert('Poné una descripción');return;}
+  if(amt<=0){alert('Monto inválido');return;}
+  if(!paidBy){alert('¿Quién pagó?');return;}
+  if(!participants.length){alert('Seleccioná quiénes participaron');return;}
+  _divExpenses.push({id:Date.now(),desc,amount:amt,paidBy,participants});
+  document.getElementById('divExpDesc').value='';
+  document.getElementById('divExpAmt').value='';
+  renderDividir();
+}
+
+function divRemoveExpense(id){
+  _divExpenses=_divExpenses.filter(e=>e.id!==id);
+  renderDividir();
+}
+
+function divPreviewParts(){
+  const amt=parseFloat(document.getElementById('divExpAmt').value)||0;
+  const participants=Array.from(document.querySelectorAll('#divExpParticipants input:checked')).map(cb=>cb.value);
+  const prev=document.getElementById('divExpPreview');if(!prev)return;
+  if(!amt||!participants.length){prev.textContent='';return;}
+  prev.textContent=`${fmt(amt/participants.length)} por persona (${participants.length} participantes)`;
+}
+
+function calcSettlement(people, expenses){
+  // Calcula balance neto de cada persona
+  const bal={};
+  people.forEach(p=>bal[p]=0);
+  expenses.forEach(exp=>{
+    const share=exp.amount/exp.participants.length;
+    exp.participants.forEach(p=>{
+      if(!bal[p])bal[p]=0;
+      bal[p]-=share; // cada participante debe su parte
+    });
+    if(bal[exp.paidBy]===undefined)bal[exp.paidBy]=0;
+    bal[exp.paidBy]+=exp.amount; // el que pagó recupera el total
+  });
+  // Simplifica deudas: positivo = te deben, negativo = debés
+  const creditors=Object.entries(bal).filter(([,v])=>v>0.01).sort((a,b)=>b[1]-a[1]);
+  const debtors  =Object.entries(bal).filter(([,v])=>v<-0.01).sort((a,b)=>a[1]-b[1]);
+  const txs=[];
+  let ci=0,di=0;
+  const cbal=[...creditors.map(([p,v])=>[p,v])];
+  const dbal=[...debtors.map(([p,v])=>[p,Math.abs(v)])];
+  while(ci<cbal.length&&di<dbal.length){
+    const [cp,cv]=cbal[ci];const [dp,dv]=dbal[di];
+    const amt=Math.min(cv,dv);
+    if(amt>0.5)txs.push({from:dp,to:cp,amount:amt});
+    cbal[ci][1]-=amt;dbal[di][1]-=amt;
+    if(cbal[ci][1]<0.5)ci++;
+    if(dbal[di][1]<0.5)di++;
+  }
+  return txs;
+}
+
+function renderDividir(){
+  // Chips de personas
+  const peopleList=document.getElementById('divPeopleList');
+  if(peopleList)peopleList.innerHTML=_divPeople.map(p=>`
+    <div class="div-person-chip">${p}<button onclick="divRemovePerson('${p}')">✕</button></div>`).join('');
+
+  // Selector "quién pagó" y checkboxes de participantes
+  const paidSel=document.getElementById('divExpPaidBy');
+  if(paidSel){
+    const prev=paidSel.value;
+    paidSel.innerHTML=_divPeople.map(p=>`<option value="${p}">${p}</option>`).join('');
+    if(_divPeople.includes(prev))paidSel.value=prev;
+  }
+  const partDiv=document.getElementById('divExpParticipants');
+  if(partDiv){
+    const prevChecked=Array.from(partDiv.querySelectorAll('input:checked')).map(cb=>cb.value);
+    partDiv.innerHTML=_divPeople.map(p=>`
+      <label style="display:flex;align-items:center;gap:4px;font-size:.8rem;background:#e9f5ff;border-radius:6px;padding:3px 8px;cursor:pointer">
+        <input type="checkbox" value="${p}" ${prevChecked.length?prevChecked.includes(p)?'checked':'':(p?'checked':'')} onchange="divPreviewParts()" style="accent-color:var(--pri)">
+        ${p}
+      </label>`).join('');
+    if(!prevChecked.length)partDiv.querySelectorAll('input').forEach(cb=>cb.checked=true);
+    divPreviewParts();
+  }
+
+  // Lista de gastos
+  const expList=document.getElementById('divExpenseList');
+  if(expList){
+    if(!_divExpenses.length){expList.innerHTML='<p style="color:var(--muted);font-size:.82rem;text-align:center;padding:8px">Sin gastos cargados aún</p>';}
+    else{
+      const totalGlobal=_divExpenses.reduce((s,e)=>s+e.amount,0);
+      expList.innerHTML=`<div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">GASTOS CARGADOS — Total: ${fmt(totalGlobal)}</div>`+
+      _divExpenses.map(e=>`
+        <div class="div-exp-row">
+          <span class="de-desc">${e.desc}</span>
+          <span class="de-amt">${fmt(e.amount)}</span>
+          <span class="de-paid">pagó <strong>${e.paidBy}</strong> · entre ${e.participants.join(', ')}</span>
+          <button class="de-del" onclick="divRemoveExpense(${e.id})">🗑</button>
+        </div>`).join('');
+    }
+  }
+
+  // Liquidación
+  const settDiv=document.getElementById('divSettlement');
+  if(!settDiv)return;
+  if(!_divExpenses.length){settDiv.innerHTML='';return;}
+  const txs=calcSettlement(_divPeople,_divExpenses);
+  settDiv.innerHTML=`<div class="settlement-card">
+    <div class="ct">✅ Quién le paga a quién para quedar todos empatados</div>
+    ${txs.length
+      ?txs.map(t=>`<div class="settle-row">
+          <span class="settle-from">💸 ${t.from}</span>
+          <span style="color:var(--muted)">→ le paga a →</span>
+          <span class="settle-to">✅ ${t.to}</span>
+          <span class="settle-amt">${fmt(Math.round(t.amount))}</span>
+        </div>`).join('')
+      :`<div class="settle-empty">🎉 ¡Todos están empatados! No hay deudas.</div>`}
+    <button onclick="_divPeople=[];_divExpenses=[];renderDividir()" style="margin-top:12px;background:none;border:1px solid var(--bdr);border-radius:8px;padding:5px 14px;font-size:.78rem;cursor:pointer;color:var(--muted)">🔄 Nueva división</button>
+  </div>`;
 }
 
 // ═══════════════════════════ INIT ═══════════════════════════
