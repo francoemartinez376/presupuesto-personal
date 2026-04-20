@@ -1356,8 +1356,8 @@ function renderBudget(){
 function renderStats(){
   const c=compute();if(!c)return;
   const m=curM();
-  const rate=getRateForDate(S.currentMonth+'-01');
-  const u=(ars)=>ars>0?` <span class="usd-badge">${fmtU(ars/rate)}</span>`:'';
+  const rate=getCurrentUSDRate()||getRateForDate(S.currentMonth+'-01')||1090;
+  const u=(ars)=>viewMode==='USD'&&ars>0?` <span class="usd-badge">${fmtU(ars/rate)}</span>`:'';
   const sd=[
     {lbl:'Ingresos Totales',val:fmt(c.iA)+u(c.iA),sub:`Plan: ${fmt(c.iP)}${u(c.iP)}`,pct:'',cls:''},
     {lbl:'🏠 Gastos Básicos',val:fmt(c.exp.needs.actual)+u(c.exp.needs.actual),sub:`Plan: ${fmt(c.exp.needs.planned)}${u(c.exp.needs.planned)} | Tope: ${fmt(c.exp.needs.target)}${u(c.exp.needs.target)}`,pct:c.exp.needs.target>0?(c.exp.needs.actual/c.exp.needs.target*100).toFixed(0)+'% del tope':'',over:c.exp.needs.actual>c.exp.needs.target&&c.exp.needs.target>0,cls:'b'},
@@ -1386,10 +1386,10 @@ function setInc(id,f,v){const m=curM();if(!m)return;const i=m.incomes.find(x=>x.
 function renderIncs(){
   const m=curM();if(!m)return;
   const mk=S.currentMonth;
-  const monthRate=getRateForDate(mk+'-01');
+  const monthRate=getCurrentUSDRate()||getRateForDate(mk+'-01')||1090;
   document.getElementById('incBody').innerHTML=m.incomes.map(i=>{
-    const actualUSD=i.actual>0?fmtU((i.actual||0)/monthRate):'';
-    const planUSD=i.planned>0?fmtU((i.planned||0)/monthRate):'';
+    const actualUSD=viewMode==='USD'&&i.actual>0?fmtU((i.actual||0)/monthRate):'';
+    const planUSD=viewMode==='USD'&&i.planned>0?fmtU((i.planned||0)/monthRate):'';
     return`<tr>
       <td><input class="ei" type="text" value="${esc(i.description)}" placeholder="Ej: Sueldo, Alquiler cobrado…" oninput="setInc(${i.id},'description',this.value)"></td>
       <td>
@@ -1436,9 +1436,9 @@ function blRow(bl){
   const cls=over&&!bl.paid?'row-over':'';
   const goalOpts=bl.cat==='savings'?`<select class="ei" onchange="setBL(${bl.id},'goalId',this.value)" style="font-size:.76rem"><option value="">—</option>${S.savings.goals.map(g=>`<option value="${g.id}" ${bl.goalId===g.id?'selected':''}>${esc(g.name.substring(0,16))}</option>`).join('')}</select>`:'—';
   const mk=S.currentMonth;
-  const rate=getRateForDate(mk+'-01');
-  const planUSD=bl.planned>0?`<div class="usd-val">${fmtU((bl.planned||0)/rate)}</div>`:'';
-  const actualUSD=actual>0?`<div class="usd-val">${fmtU(actual/rate)}</div>`:'';
+  const rate=getCurrentUSDRate()||getRateForDate(mk+'-01')||1090;
+  const planUSD=viewMode==='USD'&&bl.planned>0?`<div class="usd-val">${fmtU((bl.planned||0)/rate)}</div>`:'';
+  const actualUSD=viewMode==='USD'&&actual>0?`<div class="usd-val">${fmtU(actual/rate)}</div>`:'';
   return`<tr class="${cls}" id="bl-${bl.id}">
     <td><input class="ei" type="text" value="${esc(bl.description)}" placeholder="Descripción…" oninput="setBL(${bl.id},'description',this.value)"></td>
     <td><input class="ei" type="date" value="${bl.dueDate||''}" onchange="setBL(${bl.id},'dueDate',this.value)" style="min-width:118px;width:100%"></td>
@@ -1464,18 +1464,18 @@ function renderBLFoot(cat){
   const tP=rows.reduce((s,b)=>s+(b.planned||0),0);
   const tA=rows.reduce((s,b)=>s+lineActual(b.id),0);
   const key=cat==='needs'?'N':cat==='wants'?'W':'S';
-  const rate=getRateForDate(S.currentMonth+'-01');
-  const tPusd=tP>0?`<div class="usd-val">${fmtU(tP/rate)}</div>`:'';
-  const tAusd=tA>0?`<div class="usd-val">${fmtU(tA/rate)}</div>`:'';
+  const rate=getCurrentUSDRate()||getRateForDate(S.currentMonth+'-01')||1090;
+  const tPusd=viewMode==='USD'&&tP>0?`<div class="usd-val">${fmtU(tP/rate)}</div>`:'';
+  const tAusd=viewMode==='USD'&&tA>0?`<div class="usd-val">${fmtU(tA/rate)}</div>`:'';
   document.getElementById('foot'+key).innerHTML=`<tr><td>TOTAL</td><td></td><td style="text-align:right">${fmt(tP)}${tPusd}</td><td style="text-align:right">${fmt(tA)}${tAusd}</td><td>${dif(tP,tA,'exp')}</td><td></td><td></td><td></td></tr>`;
 }
 function renderCatTot(cat){
   const c=compute();if(!c)return;const m=curM();if(!m)return;
   const d=c.exp[cat];const over=d.actual>d.target&&d.target>0;
   const key=cat==='needs'?'N':cat==='wants'?'W':'S';
-  const rate=getRateForDate(S.currentMonth+'-01');
-  const planUSD=d.planned>0?` <span class="usd-badge">${fmtU(d.planned/rate)}</span>`:'';
-  const topeUSD=d.target>0?` <span class="usd-badge">${fmtU(d.target/rate)}</span>`:'';
+  const rate=getCurrentUSDRate()||getRateForDate(S.currentMonth+'-01')||1090;
+  const planUSD=viewMode==='USD'&&d.planned>0?` <span class="usd-badge">${fmtU(d.planned/rate)}</span>`:'';
+  const topeUSD=viewMode==='USD'&&d.target>0?` <span class="usd-badge">${fmtU(d.target/rate)}</span>`:'';
   document.getElementById('tot'+key).innerHTML=`Real: <strong>${fmt(d.actual)}</strong> | Plan: <strong>${fmt(d.planned)}</strong>${planUSD} | Tope (${m.rules[cat]}%): <strong style="color:${over?'var(--r)':'inherit'}">${fmt(d.target)}</strong>${topeUSD}`;
   const pct=d.target>0?Math.min(100,d.actual/d.target*100):0;
   const fill=document.getElementById('prog'+key);
@@ -2028,7 +2028,11 @@ function getCurrentUSDRate(){
 
 function getEntryUSDValue(entry){
   if(!entry||!entry.amount)return 0;
-  const rate=entry.usdRateAtTime||getCurrentUSDRate();
+  // Prioridad: 1) tasa guardada al momento del gasto  2) tasa histórica de ese día  3) tasa actual
+  const rate=entry.usdRateAtTime
+    ||getRateForDate(entry.date)
+    ||getCurrentUSDRate()
+    ||1090;
   return entry.amount/rate;
 }
 
