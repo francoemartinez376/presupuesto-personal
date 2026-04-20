@@ -412,6 +412,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
       <button id="btnUSD" onclick="setViewMode('USD')">$ USD</button>
     </div>
     <span id="syncBadge" class="sync-badge" style="margin-left:8px;display:none"></span>
+    <button class="settings-btn" onclick="showMyLink()" title="Mi link personal" style="font-size:.75rem;padding:6px 10px">🔗 Mi link</button>
     <button class="settings-btn" onclick="openSettings()" title="Configuración">⚙️</button>
   </div>
 </nav>
@@ -1032,40 +1033,190 @@ function setSyncBadge(s){
   else{el.className='sync-badge sync-err';el.textContent='⚠️ Sin sync';}
 }
 
-async function loadS(){
-  // 1. Try API
+// ═══════════ AUTENTICACIÓN ═══════════
+const SESSION_KEY = 'pp_session_v1';
+let _userCode = '';
+let _displayName = '';
+
+function loadSession(){
   try{
-    const r=await fetch('/api/state');
-    if(r.ok){
-      const data=await r.json();
-      // Ignorar estado vacío {} — usar defaults en ese caso
-      if(data && data.currentMonth){
-        if(!data.settings)data.settings=defaultSettings();
-        if(!data.cuotas)data.cuotas=[];
-        setSyncBadge('ok');
-        return data;
-      }
+    const s = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
+    if(s?.userCode && s?.displayName){ _userCode=s.userCode; _displayName=s.displayName; return true; }
+  }catch(e){}
+  return false;
+}
+
+function saveSession(userCode, displayName){
+  _userCode = userCode; _displayName = displayName;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({userCode, displayName}));
+}
+
+function clearSession(){
+  localStorage.removeItem(SESSION_KEY);
+  _userCode=''; _displayName='';
+}
+
+function getUserApiUrl(path){
+  return `${path}?u=${encodeURIComponent(_userCode)}`;
+}
+
+function showAuthScreen(defaultTab='login'){
+  // Eliminar si ya existe
+  document.getElementById('authOverlay')?.remove();
+  const over=document.createElement('div');
+  over.id='authOverlay';
+  over.style.cssText='position:fixed;inset:0;background:linear-gradient(135deg,#1a365d 0%,#2a4a7f 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto';
+  over.innerHTML=`
+    <div style="background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:420px;box-shadow:0 30px 80px rgba(0,0,0,.35)">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:2.6rem;margin-bottom:6px">💰</div>
+        <h1 style="font-size:1.35rem;font-weight:800;color:#1a365d;margin-bottom:4px">Presupuesto Personal</h1>
+        <p style="font-size:.82rem;color:#718096">Tus datos siempre guardados en la nube</p>
+      </div>
+      <!-- Tabs -->
+      <div style="display:flex;background:#f7fafc;border-radius:10px;padding:4px;margin-bottom:22px;gap:4px">
+        <button id="tabLogin" onclick="switchAuthTab('login')"
+          style="flex:1;padding:9px;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;background:#1a365d;color:#fff;transition:all .15s">
+          Iniciar sesión
+        </button>
+        <button id="tabRegister" onclick="switchAuthTab('register')"
+          style="flex:1;padding:9px;border:none;border-radius:8px;font-size:.85rem;font-weight:700;cursor:pointer;background:transparent;color:#718096;transition:all .15s">
+          Crear cuenta
+        </button>
+      </div>
+      <!-- Form -->
+      <div id="authForm"></div>
+      <div id="authMsg" style="margin-top:12px;font-size:.82rem;border-radius:8px;padding:10px 12px;display:none"></div>
+    </div>`;
+  document.body.appendChild(over);
+  switchAuthTab(defaultTab);
+}
+
+function switchAuthTab(tab){
+  const isLogin = tab==='login';
+  const tl=document.getElementById('tabLogin'), tr=document.getElementById('tabRegister');
+  if(tl){tl.style.background=isLogin?'#1a365d':'transparent';tl.style.color=isLogin?'#fff':'#718096';}
+  if(tr){tr.style.background=!isLogin?'#1a365d':'transparent';tr.style.color=!isLogin?'#fff':'#718096';}
+  const form=document.getElementById('authForm');if(!form)return;
+  const inp=(id,type,placeholder,label)=>`
+    <div style="margin-bottom:14px">
+      <label style="font-size:.68rem;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">${label}</label>
+      <input id="${id}" type="${type}" placeholder="${placeholder}" autocomplete="${type==='password'?(isLogin?'current-password':'new-password'):'username'}"
+        style="width:100%;padding:11px 13px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .15s"
+        onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#e2e8f0'"
+        onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>`;
+  form.innerHTML=`
+    ${inp('authUser','text','Ej: franco, nico…','Usuario')}
+    ${inp('authPass','password','Tu contraseña','Contraseña')}
+    ${!isLogin?inp('authPass2','password','Repetí la contraseña','Repetir contraseña'):''}
+    <button onclick="submitAuth()" id="authBtn"
+      style="width:100%;background:#48bb78;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.97rem;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s"
+      onmouseover="this.style.background='#38a169'" onmouseout="this.style.background='#48bb78'">
+      ${isLogin?'🔓 Entrar':'✨ Crear mi cuenta'}
+    </button>`;
+  document.getElementById('authMsg').style.display='none';
+  setTimeout(()=>document.getElementById('authUser')?.focus(),50);
+  document.getElementById('authForm')._tab=tab;
+}
+
+async function submitAuth(){
+  const tab=document.getElementById('authForm')._tab||'login';
+  const user=(document.getElementById('authUser')?.value||'').trim();
+  const pass=(document.getElementById('authPass')?.value||'');
+  const pass2=(document.getElementById('authPass2')?.value||'');
+  const msg=document.getElementById('authMsg');
+  const btn=document.getElementById('authBtn');
+
+  const showMsg=(text,ok=false)=>{
+    msg.style.display='block';
+    msg.style.background=ok?'#f0fff4':'#fff5f5';
+    msg.style.color=ok?'#276749':'#c53030';
+    msg.textContent=text;
+  };
+
+  if(!user){showMsg('Ingresá un nombre de usuario');return;}
+  if(user.length<3){showMsg('El usuario debe tener al menos 3 caracteres');return;}
+  if(!pass){showMsg('Ingresá una contraseña');return;}
+  if(pass.length<4){showMsg('La contraseña debe tener al menos 4 caracteres');return;}
+  if(tab==='register'&&pass!==pass2){showMsg('Las contraseñas no coinciden');return;}
+
+  btn.disabled=true; btn.textContent='⏳ Cargando…';
+  try{
+    const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:tab,username:user,password:pass})});
+    const data=await r.json();
+    if(!r.ok||!data.ok){
+      showMsg(data.error||'Error al conectar');
+      btn.disabled=false; btn.textContent=tab==='login'?'🔓 Entrar':'✨ Crear mi cuenta';
+      return;
     }
-  }catch(e){console.warn('API load failed, using localStorage:',e);}
-  // 2. Fallback localStorage
+    saveSession(data.userCode, data.displayName);
+    showMsg(tab==='login'?`¡Bienvenido de vuelta, ${data.displayName}! 🎉`:`¡Cuenta creada, ${data.displayName}! 🎉`,true);
+    setTimeout(()=>{ document.getElementById('authOverlay')?.remove(); initApp(); },1200);
+  }catch(e){
+    showMsg('Sin conexión — revisá internet');
+    btn.disabled=false; btn.textContent=tab==='login'?'🔓 Entrar':'✨ Crear mi cuenta';
+  }
+}
+
+function showMyLink(){
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML=`
+    <div style="background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+      <div style="font-size:.9rem;font-weight:800;color:#1a365d;margin-bottom:12px">👤 Cuenta: ${_displayName}</div>
+      <p style="font-size:.82rem;color:#718096;margin-bottom:16px;line-height:1.5">
+        Tus datos están guardados en la nube. Si cambiás de dispositivo o borrás el navegador, entrá con tu usuario y contraseña y todo va a estar ahí.
+      </p>
+      <div style="background:#f0fff4;border-radius:8px;padding:12px 14px;font-size:.82rem;color:#276749;margin-bottom:16px;border:1px solid #c6f6d5">
+        ✅ Tus datos están sincronizados con Supabase — nunca se pierden.
+      </div>
+      <button onclick="if(confirm('¿Cerrar sesión?')){clearSession();location.reload()}" style="width:100%;background:#e2e8f0;color:#4a5568;border:none;border-radius:8px;padding:10px;font-size:.84rem;font-weight:700;cursor:pointer;margin-bottom:8px">
+        🚪 Cerrar sesión
+      </button>
+      <button onclick="this.closest('div[style*=fixed]').remove()" style="width:100%;background:#1a365d;color:#fff;border:none;border-radius:8px;padding:10px;font-size:.84rem;font-weight:700;cursor:pointer">
+        Cerrar
+      </button>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
+}
+
+async function loadS(){
+  // 1. Try API (con código de usuario)
+  if(_userCode){
+    try{
+      const r=await fetch(getUserApiUrl('/api/state'));
+      if(r.ok){
+        const data=await r.json();
+        if(data && data.currentMonth){
+          if(!data.settings)data.settings=defaultSettings();
+          if(!data.cuotas)data.cuotas=[];
+          setSyncBadge('ok');
+          return data;
+        }
+      }
+    }catch(e){console.warn('API load failed, using localStorage:',e);}
+  }
+  // 2. Fallback localStorage (con clave por código)
+  const lsKey=_userCode?`pp_v6_${_userCode}`:SK;
   try{
-    const r=localStorage.getItem(SK);
+    const r=localStorage.getItem(lsKey)||localStorage.getItem(SK);
     if(r){const p=JSON.parse(r);if(!p.settings)p.settings=defaultSettings();if(!p.cuotas)p.cuotas=[];return p;}
-    const old=localStorage.getItem('pp_v5');
-    if(old){const p=JSON.parse(old);p.settings=defaultSettings();p.cuotas=[];return p;}
   }catch(e){}
   return mkDemoState();
 }
 
 function saveS(){
-  // Guardar siempre en localStorage (backup inmediato)
-  try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}
-  // Debounce sync a API (500ms)
+  const lsKey=_userCode?`pp_v6_${_userCode}`:SK;
+  try{localStorage.setItem(lsKey,JSON.stringify(S));}catch(e){}
+  if(!_userCode)return; // sin código no sincroniza
   setSyncBadge('pending');
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(async()=>{
     try{
-      const r=await fetch('/api/state',{
+      const r=await fetch(getUserApiUrl('/api/state'),{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify(S)
@@ -2806,8 +2957,11 @@ function renderDividir(){
 // ═══════════════════════════ INIT ═══════════════════════════
 // loadS es async ahora (intenta API antes de localStorage)
 S=mkDemoState(); // placeholder mientras carga
-document.addEventListener('DOMContentLoaded',async()=>{
+async function initApp(){
   S=await loadS();
+  // Actualizar marca con nombre del usuario
+  const brand=document.querySelector('.nav-brand');
+  if(brand&&_displayName) brand.textContent=`💰 ${_displayName}`;
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('eDate').value=today;
   document.getElementById('txDate').value=today;
@@ -2819,6 +2973,15 @@ document.addEventListener('DOMContentLoaded',async()=>{
   filterEntryLines();
   fetchRates().catch(()=>{});
   fetchInflation().catch(()=>{});
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  // Verificar sesión guardada
+  if(loadSession()){
+    initApp();
+  } else {
+    showAuthScreen('login');
+  }
 });
 </script>
 </body>

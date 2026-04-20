@@ -5,8 +5,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 );
 
-const USER_ID = 'franco';
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -14,13 +12,19 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  // El user ID viene del query param ?u=CODIGO_SECRETO
+  const userId = req.query.u;
+  if (!userId || userId.length < 4) {
+    return res.status(400).json({ error: 'Missing or invalid user code' });
+  }
+
   // GET — cargar estado
   if (req.method === 'GET') {
     try {
       const { data, error } = await supabase
         .from('user_state')
         .select('state')
-        .eq('id', USER_ID)
+        .eq('id', userId)
         .single();
       if (error && error.code !== 'PGRST116') throw error;
       return res.status(200).json(data?.state ?? null);
@@ -36,7 +40,7 @@ export default async function handler(req, res) {
       const state = req.body;
       const { error } = await supabase
         .from('user_state')
-        .upsert({ id: USER_ID, state, updated_at: new Date().toISOString() });
+        .upsert({ id: userId, state, updated_at: new Date().toISOString() });
       if (error) throw error;
       return res.status(200).json({ ok: true });
     } catch (e) {

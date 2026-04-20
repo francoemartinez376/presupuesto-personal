@@ -1,14 +1,20 @@
 -- Correr esto en Supabase → SQL Editor
 
+-- Tabla de datos del presupuesto por usuario
 CREATE TABLE IF NOT EXISTS user_state (
   id TEXT PRIMARY KEY,
   state JSONB NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
-
--- Deshabilitar RLS (acceso solo desde server-side con service key)
 ALTER TABLE user_state DISABLE ROW LEVEL SECURITY;
 
--- Insertar fila inicial vacía para Franco
-INSERT INTO user_state (id, state) VALUES ('franco', '{}')
-ON CONFLICT (id) DO NOTHING;
+-- Tabla de usuarios con login
+CREATE TABLE IF NOT EXISTS auth_users (
+  username TEXT PRIMARY KEY,
+  display_name TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  salt TEXT NOT NULL,
+  user_code TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE auth_users DISABLE ROW LEVEL SECURITY;
