@@ -901,19 +901,10 @@ function mkDemoState(){
   return{
     currentMonth:'2026-04',
     months,
-    dailyEntries:de,
-    savings:{
-      goals:[
-        {id:9001,name:'Colchón',      targetAmount:10000,initialSavings:300,startDate:'2026-01-01',targetDate:'2026-09-27'},
-        {id:9002,name:'Peugeot 308',  targetAmount:5000, initialSavings:0,  startDate:'2026-01-01',targetDate:'2026-09-27'},
-      ],
-      transactions:[]
-    },
-    settings:{usdRate:null,rateType:'blue',inflationRates:{'2026-04':3.2},currentRates:{blue:null,oficial:null,mep:null},ratesLastFetch:null,inflLastFetch:null,historicalRates:{'2026-04-01':1090}},
-    cuotas:[
-      {id:7001,description:'Smart TV Samsung 55"',totalAmount:480000,numCuotas:12,startMonth:'2026-01',cat:'wants',budgetLineId:null},
-      {id:7002,description:'Colchón Piero',totalAmount:360000,numCuotas:6,startMonth:'2026-02',cat:'needs',budgetLineId:null},
-    ]
+    dailyEntries:[],
+    savings:{goals:[],transactions:[]},
+    settings:{usdRate:null,rateType:'blue',inflationRates:{},currentRates:{blue:null,oficial:null,mep:null},ratesLastFetch:null,inflLastFetch:null,historicalRates:{}},
+    cuotas:[]
   };
 }
 
