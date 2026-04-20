@@ -865,6 +865,8 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 <div id="pane-daily" class="pane">
   <!-- Summary banner -->
   <div class="daily-summary" id="dailySummary"></div>
+  <!-- AutoCat recommendations -->
+  <div id="catRecsPanel" style="display:none"></div>
   <!-- Quick add form -->
   <div class="add-entry-form">
     <div class="ct" style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
@@ -899,8 +901,18 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     </div>
     <div style="margin-top:10px">
       <div class="field" style="flex-direction:row;align-items:center;gap:10px">
-        <label style="white-space:nowrap;font-size:.67rem;color:var(--muted)">DESCRIPCIÓN LIBRE</label>
-        <input type="text" id="eDesc" placeholder="Ej: YPF, Jumbo, La Cabrera…" style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem">
+        <label style="white-space:nowrap;font-size:.67rem;color:var(--muted)">DESCRIPCIÓN</label>
+        <input type="text" id="eDesc" placeholder="Ej: YPF, Jumbo, Uber, La Cabrera…"
+          style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem"
+          oninput="autoCatDebounce()" autocomplete="off">
+      </div>
+      <!-- IA suggestion chip -->
+      <div id="autoCatSuggestion" style="display:none;margin-top:8px;padding:8px 12px;background:linear-gradient(135deg,#ebf8ff,#e6fffa);border:1.5px solid #90cdf4;border-radius:10px;display:none;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:.78rem;color:#2b6cb0;flex:1">
+          🤖 <span id="acSugText"></span>
+        </span>
+        <button onclick="acceptAutoCat()" style="background:#3182ce;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.75rem;font-weight:700;cursor:pointer">✓ Usar</button>
+        <button onclick="rejectAutoCat()" style="background:transparent;color:#718096;border:1px solid #cbd5e0;border-radius:6px;padding:5px 10px;font-size:.75rem;font-weight:700;cursor:pointer">No es esto</button>
       </div>
     </div>
     <!-- Gasto compartido toggle -->
@@ -1082,6 +1094,51 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   </div>
 </div>
 
+<!-- ══════ AUTOCAT LEARN MODAL ══════ -->
+<div id="learnOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:700;align-items:flex-end;justify-content:center;padding:0">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:520px;padding:24px 22px 32px;box-shadow:0 -8px 40px rgba(0,0,0,.2)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:1rem;font-weight:800;color:#1a365d">🧠 Enseñame este gasto</div>
+      <button onclick="closeLearnModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#718096;padding:4px">✕</button>
+    </div>
+    <p style="font-size:.84rem;color:#718096;margin-bottom:16px;line-height:1.5">
+      No reconocí <strong id="learnDescLabel" style="color:#2d3748"></strong>. ¿Podés decirme qué tipo de gasto es? Así la próxima lo categorizo solo.
+    </p>
+    <!-- Category picker -->
+    <div style="margin-bottom:12px">
+      <label style="font-size:.67rem;font-weight:700;color:#718096;text-transform:uppercase;display:block;margin-bottom:6px">Categoría</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="learn-cat-btn" onclick="selectLearnCat('needs')" data-cat="needs"
+          style="flex:1;min-width:80px;padding:10px 8px;border:2px solid #bee3f8;border-radius:10px;background:#ebf8ff;color:#2b6cb0;font-size:.82rem;font-weight:700;cursor:pointer">🏠 Necesidades</button>
+        <button class="learn-cat-btn" onclick="selectLearnCat('wants')" data-cat="wants"
+          style="flex:1;min-width:80px;padding:10px 8px;border:2px solid #fbd38d;border-radius:10px;background:#fffaf0;color:#c05621;font-size:.82rem;font-weight:700;cursor:pointer">🎉 Discrecional</button>
+        <button class="learn-cat-btn" onclick="selectLearnCat('savings')" data-cat="savings"
+          style="flex:1;min-width:80px;padding:10px 8px;border:2px solid #9ae6b4;border-radius:10px;background:#f0fff4;color:#276749;font-size:.82rem;font-weight:700;cursor:pointer">💎 Ahorro</button>
+      </div>
+    </div>
+    <!-- Budget line picker -->
+    <div style="margin-bottom:12px" id="learnLineWrap" style="display:none">
+      <label style="font-size:.67rem;font-weight:700;color:#718096;text-transform:uppercase;display:block;margin-bottom:6px">Línea del presupuesto</label>
+      <select id="learnLineSelect" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;background:#fff">
+        <option value="">Sin línea específica</option>
+      </select>
+    </div>
+    <!-- Optional note -->
+    <div style="margin-bottom:16px">
+      <label style="font-size:.67rem;font-weight:700;color:#718096;text-transform:uppercase;display:block;margin-bottom:6px">Nota (opcional) — contexto para aprender mejor</label>
+      <input type="text" id="learnNote" placeholder="Ej: Es el delivery de comida que uso siempre…"
+        style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem">
+    </div>
+    <button onclick="saveLearnPattern()" id="learnSaveBtn"
+      style="width:100%;padding:13px;background:#1a365d;color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer">
+      💾 Guardar y aprender
+    </button>
+    <button onclick="closeLearnModal()" style="width:100%;padding:10px;background:none;border:none;color:#718096;font-size:.82rem;cursor:pointer;margin-top:8px">
+      Saltar por ahora
+    </button>
+  </div>
+</div>
+
 <!-- ══════ SETTINGS MODAL ══════ -->
 <div id="settingsOverlay" class="settings-overlay" style="display:none" onclick="if(event.target===this)closeSettings()">
   <div class="settings-modal">
@@ -1259,7 +1316,8 @@ function mkDemoState(){
       transactions: []
     },
     settings: {usdRate:null, rateType:'blue', inflationRates:{}, currentRates:{blue:null,oficial:null,mep:null}, ratesLastFetch:null, inflLastFetch:null, historicalRates:{}},
-    cuotas: []
+    cuotas: [],
+    autocat: {patterns:[], unknownSeen:{}}
   };
 }
 
@@ -1485,6 +1543,7 @@ async function loadS(){
         if(data && data.currentMonth){
           if(!data.settings)data.settings=defaultSettings();
           if(!data.cuotas)data.cuotas=[];
+          if(!data.autocat)data.autocat={patterns:[],unknownSeen:{}};
           setSyncBadge('ok');
           return data;
         }
@@ -1495,7 +1554,7 @@ async function loadS(){
   const lsKey=_userCode?`pp_v6_${_userCode}`:SK;
   try{
     const r=localStorage.getItem(lsKey)||localStorage.getItem(SK);
-    if(r){const p=JSON.parse(r);if(!p.settings)p.settings=defaultSettings();if(!p.cuotas)p.cuotas=[];return p;}
+    if(r){const p=JSON.parse(r);if(!p.settings)p.settings=defaultSettings();if(!p.cuotas)p.cuotas=[];if(!p.autocat)p.autocat={patterns:[],unknownSeen:{}};return p;}
   }catch(e){}
   return mkDemoState();
 }
@@ -2066,6 +2125,286 @@ function renderBudgetCharts(){
   );
 }
 
+// ══════════════════ AUTO-CATEGORIZATION ENGINE ══════════════════
+
+// Built-in keyword rules (Argentine context)
+const KEYWORD_DB = [
+  {kw:['uber','cabify','didi','taxi','remis','colectivo','subte','tren','sube','peaje','autopista'],        cat:'needs', hint:'Transporte'},
+  {kw:['pedidos ya','pedidosya','rappi','glovo','wolt','just eat','delivery'],                              cat:'wants', hint:'Delivery / Comida'},
+  {kw:['ypf','shell','axion','petrobras','puma','nafta','combustible','gasoil','carga nafta'],               cat:'needs', hint:'Combustible'},
+  {kw:['supermercado','carrefour','dia ','coto ','jumbo','walmart','disco','vea','la anonima','hipermercado','almacén','almacen','verduleria','verdulería','frutería','fruteria'], cat:'needs', hint:'Supermercado'},
+  {kw:['farmacia','farmacity','ahorro farmacia','drogueria','droguería','medicamento','remedios'],           cat:'needs', hint:'Salud / Farmacia'},
+  {kw:['netflix','spotify','disney','hbo','amazon prime','youtube premium','apple tv','paramount','flow','telecine'], cat:'wants', hint:'Streaming'},
+  {kw:['gym','gimnasio','sport club','megatlon','goodlife','fitpass','crossfit'],                            cat:'wants', hint:'Gimnasio'},
+  {kw:['mcdonalds','mcdonald','burger king','wendys','mostaza','bk ','subway','taco bell','kfc'],            cat:'wants', hint:'Fast food'},
+  {kw:['edesur','edenor','edelap','luz ','electricidad'],                                                   cat:'needs', hint:'Electricidad'},
+  {kw:['metrogas','gasnea','camuzzi','gas natural'],                                                        cat:'needs', hint:'Gas'},
+  {kw:['aysa','agua y saneamientos','agua '],                                                               cat:'needs', hint:'Agua'},
+  {kw:['internet','fibertel','cablevision','telecentro','claro hogar','arnet','personal hogar'],             cat:'needs', hint:'Internet'},
+  {kw:['personal ','movistar','claro ','tuenti','telefonía','telefonia','cel ','celular'],                   cat:'needs', hint:'Telefonía'},
+  {kw:['alquiler','expensas','consorcio'],                                                                   cat:'needs', hint:'Alquiler / Expensas'},
+  {kw:['cine','teatro','show','recital','evento','entradas','entrada '],                                     cat:'wants', hint:'Entretenimiento'},
+  {kw:['ropa','zapatillas','zara','h&m','adidas','nike','lacoste','indumentaria','calzado','polleria'],      cat:'wants', hint:'Ropa / Calzado'},
+  {kw:['medico','médico','doctor','consulta médica','guardia','clinica','clínica','osde','swiss medical','galeno','obra social','prepaga'], cat:'needs', hint:'Salud / Médico'},
+  {kw:['restaurant','restaurante','parrilla','sushi','pizza','empanadas','rotiseria','rotisería','comida ','almuerzo','cena ','desayuno'], cat:'wants', hint:'Restaurante'},
+  {kw:['café','cafe ','cafetería','cafeteria','starbucks','freddo','helado'],                                cat:'wants', hint:'Café / Helado'},
+  {kw:['mercadopago','mercado pago','mp ','transferencia','banco','débito','debito','cajero'],               cat:'needs', hint:'Banco / Transferencia'},
+  {kw:['ahorro','plazo fijo','fci','fondo','billetera','inversión','inversion','cedear','accion','cripto'], cat:'savings', hint:'Ahorro / Inversión'},
+  {kw:['seguro','broker','galicia seguros','zurich','la caja','san cristobal'],                              cat:'needs', hint:'Seguros'},
+  {kw:['libro','libros','libreria','librería','educación','educacion','curso','capacitación','udemy','coursera'], cat:'wants', hint:'Educación'},
+  {kw:['mascotas','veterinaria','petshop','pet ','perro','gato'],                                            cat:'wants', hint:'Mascotas'},
+  {kw:['niñera','guarderia','guardería','colegio','escuela','jardin','jardín'],                              cat:'needs', hint:'Educación / Niños'},
+  {kw:['limpieza','femicleaner','señora limpieza','mucama'],                                                 cat:'needs', hint:'Limpieza'},
+  {kw:['correo','oca ','andreani','despacho'],                                                               cat:'needs', hint:'Envíos'},
+];
+
+// Normalize string for matching
+function normStr(s){ return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+
+// Check if desc matches keyword (respects word boundaries loosely)
+function kwMatch(desc, kw){
+  const d=normStr(desc);
+  const k=normStr(kw);
+  return d===k || d.startsWith(k) || d.endsWith(k) || d.includes(' '+k) || d.includes(k+' ') || d.includes(k);
+}
+
+// Main matching function — returns best match {cat, lineId, lineDesc, confidence, source} or null
+function autoCatMatch(rawDesc){
+  if(!rawDesc||rawDesc.length<2) return null;
+  const desc=normStr(rawDesc);
+  const m=curM(); if(!m) return null;
+
+  // 1. User-learned patterns (highest priority)
+  const patterns=(S.autocat||{}).patterns||[];
+  for(const p of patterns){
+    if(kwMatch(desc, p.desc)){
+      // Find line in current month
+      const line=p.lineId?m.budgetLines.find(b=>b.id===p.lineId):null;
+      const lineDesc=line?.description||p.lineDesc||'';
+      return {cat:p.cat, lineId:p.lineId||null, lineDesc, confidence:'alto', source:'aprendido', hint:p.hint||lineDesc};
+    }
+  }
+
+  // 2. History — look at past entries with same normalized desc
+  const histMatches=(S.dailyEntries||[]).filter(e=>
+    e.cat!=='income' && normStr(e.description||'').includes(desc) && e.budgetLineId
+  );
+  if(histMatches.length>=2){
+    // Most common cat+lineId in history
+    const freq={};
+    histMatches.forEach(e=>{
+      const k=e.cat+'|'+e.budgetLineId;
+      freq[k]=(freq[k]||0)+1;
+    });
+    const best=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+    if(best&&best[1]>=2){
+      const [cat,lineId]=best[0].split('|');
+      const line=m.budgetLines.find(b=>b.id==lineId);
+      if(line) return {cat, lineId:parseInt(lineId), lineDesc:line.description, confidence:'alto', source:'historial', hint:line.description};
+    }
+  }
+
+  // 3. Keyword DB
+  for(const rule of KEYWORD_DB){
+    for(const kw of rule.kw){
+      if(kwMatch(desc, kw)){
+        // Try to find matching line in current month
+        const lines=m.budgetLines.filter(b=>b.cat===rule.cat);
+        // Fuzzy match line by name
+        let matchLine=lines.find(b=>normStr(b.description).includes(normStr(rule.hint))||normStr(rule.hint).includes(normStr(b.description)));
+        if(!matchLine) matchLine=lines[0]; // fallback to first line of category
+        return {cat:rule.cat, lineId:matchLine?.id||null, lineDesc:matchLine?.description||rule.hint, confidence:'medio', source:'reglas', hint:rule.hint};
+      }
+    }
+  }
+
+  return null;
+}
+
+// State for current suggestion
+let _acSuggestion=null;
+
+let _acTimer=null;
+function autoCatDebounce(){
+  clearTimeout(_acTimer);
+  _acTimer=setTimeout(()=>{
+    const desc=document.getElementById('eDesc').value.trim();
+    if(!desc||desc.length<2){ hideAutoCatSuggestion(); return; }
+    if(_entryType!=='gasto'){ hideAutoCatSuggestion(); return; }
+    const match=autoCatMatch(desc);
+    if(match) showAutoCatSuggestion(match, desc);
+    else hideAutoCatSuggestion();
+  }, 350);
+}
+
+const CAT_LABELS={needs:'🏠 Necesidades',wants:'🎉 Discrecional',savings:'💎 Ahorro/Inv.'};
+
+function showAutoCatSuggestion(match, desc){
+  _acSuggestion=match;
+  const box=document.getElementById('autoCatSuggestion');
+  const txt=document.getElementById('acSugText');
+  if(!box||!txt) return;
+  const catLabel=CAT_LABELS[match.cat]||match.cat;
+  const lineLabel=match.lineDesc?` → <strong>${match.lineDesc}</strong>`:'';
+  const src=match.source==='aprendido'?'<span style="background:#c6f6d5;color:#276749;border-radius:4px;padding:1px 5px;font-size:.7rem">✓ aprendido</span>':
+            match.source==='historial'?'<span style="background:#bee3f8;color:#2b6cb0;border-radius:4px;padding:1px 5px;font-size:.7rem">📋 historial</span>':'';
+  txt.innerHTML=`${catLabel}${lineLabel} ${src}`;
+  box.style.display='flex';
+}
+
+function hideAutoCatSuggestion(){
+  const box=document.getElementById('autoCatSuggestion');
+  if(box) box.style.display='none';
+  _acSuggestion=null;
+}
+
+function acceptAutoCat(){
+  if(!_acSuggestion) return;
+  // Set category
+  const catSel=document.getElementById('eCat');
+  if(catSel) catSel.value=_acSuggestion.cat;
+  filterEntryLines();
+  // Set line
+  if(_acSuggestion.lineId){
+    const lineSel=document.getElementById('eLine');
+    if(lineSel){
+      // Find the option
+      const opt=Array.from(lineSel.options).find(o=>parseInt(o.value)===_acSuggestion.lineId);
+      if(opt) lineSel.value=opt.value;
+    }
+  }
+  hideAutoCatSuggestion();
+}
+
+function rejectAutoCat(){
+  // User says suggestion is wrong — open learn modal so they can set the right category
+  const desc=document.getElementById('eDesc').value.trim();
+  hideAutoCatSuggestion();
+  if(desc) openLearnModal(desc);
+}
+
+// ── Learn modal ──
+let _learnDesc='';
+let _learnCat='';
+
+function openLearnModal(desc){
+  _learnDesc=desc;
+  _learnCat='';
+  document.getElementById('learnDescLabel').textContent='"'+desc+'"';
+  document.getElementById('learnNote').value='';
+  document.getElementById('learnLineWrap').style.display='none';
+  // Reset cat buttons
+  document.querySelectorAll('.learn-cat-btn').forEach(b=>{b.style.opacity='1';b.style.transform='scale(1)';});
+  const overlay=document.getElementById('learnOverlay');
+  overlay.style.display='flex';
+  // Animate slide up
+  setTimeout(()=>{overlay.querySelector('div').style.transform='translateY(0)';},10);
+}
+
+function closeLearnModal(){
+  document.getElementById('learnOverlay').style.display='none';
+}
+
+function selectLearnCat(cat){
+  _learnCat=cat;
+  document.querySelectorAll('.learn-cat-btn').forEach(b=>{
+    const active=b.dataset.cat===cat;
+    b.style.opacity=active?'1':'0.45';
+    b.style.transform=active?'scale(1.04)':'scale(1)';
+    b.style.fontWeight=active?'800':'700';
+  });
+  // Show budget line picker
+  const wrap=document.getElementById('learnLineWrap');
+  const sel=document.getElementById('learnLineSelect');
+  const m=curM(); if(!m) return;
+  const lines=m.budgetLines.filter(b=>b.cat===cat);
+  sel.innerHTML='<option value="">Sin línea específica</option>'+lines.map(b=>`<option value="${b.id}">${esc(b.description)}</option>`).join('');
+  wrap.style.display='block';
+}
+
+function saveLearnPattern(){
+  if(!_learnCat){alert('Elegí una categoría primero');return;}
+  if(!S.autocat) S.autocat={patterns:[],unknownSeen:{}};
+  if(!S.autocat.patterns) S.autocat.patterns=[];
+  const lineId=parseInt(document.getElementById('learnLineSelect').value)||null;
+  const note=document.getElementById('learnNote').value.trim();
+  const m=curM();
+  const line=lineId&&m?m.budgetLines.find(b=>b.id===lineId):null;
+  // Upsert pattern (replace if same desc exists)
+  const idx=S.autocat.patterns.findIndex(p=>normStr(p.desc)===normStr(_learnDesc));
+  const newP={desc:normStr(_learnDesc), cat:_learnCat, lineId, lineDesc:line?.description||'', hint:line?.description||CAT_LABELS[_learnCat], note, learned:true};
+  if(idx>=0) S.autocat.patterns[idx]=newP;
+  else S.autocat.patterns.push(newP);
+  // Also apply to the current form
+  const catSel=document.getElementById('eCat');
+  if(catSel) catSel.value=_learnCat;
+  filterEntryLines();
+  if(lineId){
+    const lineSel=document.getElementById('eLine');
+    if(lineSel){
+      const opt=Array.from(lineSel.options).find(o=>parseInt(o.value)===lineId);
+      if(opt) lineSel.value=opt.value;
+    }
+  }
+  saveS();
+  closeLearnModal();
+  // Confirm toast
+  showToast('🧠 ¡Aprendido! La próxima lo categorizo solo.');
+}
+
+// Track unknown descriptions seen more than once → suggest new category line
+function trackUnknown(desc){
+  if(!S.autocat) S.autocat={patterns:[],unknownSeen:{}};
+  if(!S.autocat.unknownSeen) S.autocat.unknownSeen={};
+  const k=normStr(desc);
+  S.autocat.unknownSeen[k]=(S.autocat.unknownSeen[k]||0)+1;
+}
+
+// Simple toast notification
+function showToast(msg, duration=2800){
+  let t=document.getElementById('appToast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='appToast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a365d;color:#fff;padding:11px 20px;border-radius:30px;font-size:.84rem;font-weight:700;z-index:9000;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>{t.style.opacity='0';},duration);
+}
+
+// Render category recommendations banner
+function renderCatRecommendations(){
+  const panel=document.getElementById('catRecsPanel');
+  if(!panel) return;
+  const m=curM(); if(!m){panel.style.display='none';return;}
+  const seen=(S.autocat||{}).unknownSeen||{};
+  const patterns=(S.autocat||{}).patterns||[];
+  const learnedDescs=new Set(patterns.map(p=>p.desc));
+
+  // Find unknowns seen ≥2 times not yet learned and not matching keyword DB
+  const recs=Object.entries(seen)
+    .filter(([k,v])=>v>=2&&!learnedDescs.has(k)&&!autoCatMatch(k))
+    .sort((a,b)=>b[1]-a[1])
+    .slice(0,4);
+
+  if(!recs.length){panel.style.display='none';return;}
+  panel.style.display='block';
+  panel.innerHTML=`
+    <div style="background:linear-gradient(135deg,#fffbeb,#fefcbf);border:1.5px solid #f6e05e;border-radius:12px;padding:14px 16px;margin-bottom:14px">
+      <div style="font-size:.83rem;font-weight:800;color:#744210;margin-bottom:10px">💡 Gastos frecuentes sin categorizar — enseñame cómo clasificarlos</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${recs.map(([k,v])=>`
+          <button onclick="openLearnModal('${k}')"
+            style="background:#fff;border:1.5px solid #f6ad55;border-radius:20px;padding:7px 14px;font-size:.8rem;font-weight:700;color:#7b341e;cursor:pointer;display:flex;align-items:center;gap:6px">
+            <span>${k}</span><span style="background:#feebc8;border-radius:10px;padding:1px 7px;font-size:.7rem">${v}x</span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+}
+
 // ═══════════════════════════ DAILY LOG ═══════════════════════════
 function filterEntryLines(){
   const cat=document.getElementById('eCat').value;
@@ -2191,10 +2530,71 @@ function addEntry(){
     if(isSplit){ document.getElementById('eSplitToggle').checked=false; document.getElementById('splitSection').style.display='none'; _splitPeople=['Yo']; }
   }
 
+  // Track unknown descriptions for learning recommendations
+  if(_entryType==='gasto'){
+    const descVal=document.getElementById('eDesc').value.trim();
+    if(descVal&&!autoCatMatch(descVal)) trackUnknown(descVal);
+  }
   document.getElementById('eAmt').value='';
   document.getElementById('eDesc').value='';
+  hideAutoCatSuggestion();
   saveS();renderDaily();
   if(document.getElementById('pane-budget').classList.contains('active'))renderBudget();
+}
+
+// Open learn/recategorize modal for an existing entry
+function recatEntry(id){
+  const entry=S.dailyEntries.find(e=>e.id===id);
+  if(!entry) return;
+  // Pre-select current category and open modal in "correct mode"
+  _learnDesc=normStr(entry.description||'');
+  _learnCat='';
+  const overlay=document.getElementById('learnOverlay');
+  document.getElementById('learnDescLabel').textContent='"'+entry.description+'"';
+  document.getElementById('learnNote').value='';
+  document.getElementById('learnLineWrap').style.display='none';
+  document.querySelectorAll('.learn-cat-btn').forEach(b=>{b.style.opacity='1';b.style.transform='scale(1)';});
+  overlay.style.display='flex';
+  // Override save to also update this specific entry
+  window._recatEntryId=id;
+}
+
+// Override saveLearnPattern to also patch the entry's cat/line if recatting
+const _origSaveLearnPattern=saveLearnPattern;
+function saveLearnPattern(){
+  if(!_learnCat){alert('Elegí una categoría primero');return;}
+  if(!S.autocat) S.autocat={patterns:[],unknownSeen:{}};
+  if(!S.autocat.patterns) S.autocat.patterns=[];
+  const lineId=parseInt(document.getElementById('learnLineSelect').value)||null;
+  const note=document.getElementById('learnNote').value.trim();
+  const m=curM();
+  const line=lineId&&m?m.budgetLines.find(b=>b.id===lineId):null;
+  const idx=S.autocat.patterns.findIndex(p=>normStr(p.desc)===normStr(_learnDesc));
+  const newP={desc:normStr(_learnDesc), cat:_learnCat, lineId, lineDesc:line?.description||'', hint:line?.description||CAT_LABELS[_learnCat], note, learned:true};
+  if(idx>=0) S.autocat.patterns[idx]=newP;
+  else S.autocat.patterns.push(newP);
+  // If called from recatEntry, patch that specific entry
+  if(window._recatEntryId){
+    const entry=S.dailyEntries.find(e=>e.id===window._recatEntryId);
+    if(entry){ entry.cat=_learnCat; if(lineId) entry.budgetLineId=lineId; }
+    window._recatEntryId=null;
+  } else {
+    // Apply to current form
+    const catSel=document.getElementById('eCat');
+    if(catSel) catSel.value=_learnCat;
+    filterEntryLines();
+    if(lineId){
+      const lineSel=document.getElementById('eLine');
+      if(lineSel){
+        const opt=Array.from(lineSel.options).find(o=>parseInt(o.value)===lineId);
+        if(opt) lineSel.value=opt.value;
+      }
+    }
+  }
+  saveS();
+  closeLearnModal();
+  renderDaily();
+  showToast('🧠 ¡Aprendido! La próxima lo categorizo solo.');
 }
 
 function delEntry(id){
@@ -2212,6 +2612,7 @@ function delEntry(id){
 function renderDaily(){
   const mk=S.currentMonth;
   const m=S.months[mk];if(!m)return;
+  renderCatRecommendations();
   filterEntryLines();
   const entries=S.dailyEntries.filter(e=>e.monthKey===mk).sort((a,b)=>b.date.localeCompare(a.date));
   const expEntries=entries.filter(e=>e.cat!=='income'); // solo gastos para totales
@@ -2292,6 +2693,7 @@ function renderDaily(){
             </div>
             ${e.usdRateAtTime?`<div class="usd-val">${viewMode==='USD'?`@ $${e.usdRateAtTime.toLocaleString('es-AR')} ARS`:`≈ ${fmtU(e.amount/e.usdRateAtTime)}`}</div>`:''}
           </div>
+          ${!isIncome?`<button title="Corregir categoría" onclick="recatEntry(${e.id})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:.85rem;padding:3px 5px;border-radius:4px;transition:color .15s" onmouseover="this.style.color='#3182ce'" onmouseout="this.style.color='#a0aec0'">✏️</button>`:''}
           <button class="btn btn-del" onclick="delEntry(${e.id})">✕</button>
         </div>`;
       }).join('')}
