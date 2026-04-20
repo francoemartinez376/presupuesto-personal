@@ -324,8 +324,9 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 .ai-import-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:8px;padding:7px 15px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-left:auto;white-space:nowrap}
 .ai-import-btn:hover{opacity:.9}
 
-/* ── Bottom Nav (mobile only) ── */
-.mob-nav{display:none}
+/* ── Bottom Nav (mobile only, always hidden on desktop) ── */
+.mob-nav{display:none!important}
+.mob-nav-more-panel{display:none!important}
 
 /* Responsive */
 @media(max-width:1024px){.g4{grid-template-columns:1fr 1fr 1fr}.gc1,.gc2{grid-template-columns:1fr}.cp-grid{grid-template-columns:1fr 1fr}}
@@ -334,6 +335,10 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 
 /* ═══════════════ MOBILE FIRST (≤640px) ═══════════════ */
 @media(max-width:640px){
+  /* ── Re-enable mobile-only elements ── */
+  .mob-nav{display:flex!important}
+  .mob-nav-more-panel.open{display:block!important}
+
   /* ── Top nav: simplified ── */
   .nav{padding:0 12px;min-height:50px}
   .nav-brand{font-size:.88rem;padding:12px 0}
