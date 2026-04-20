@@ -3353,7 +3353,14 @@ async function analyzeImage(){
 
   // Build list of budget line names for context
   const m=curM();
-  const blContext=m?m.budgetLines.map(b=>`- ${b.description} (${b.cat==='needs'?'necesidades':b.cat==='wants'?'discrecional':'ahorro'})`).join('\n'):'';
+  const blNeeds=m?m.budgetLines.filter(b=>b.cat==='needs').map(b=>`  • ${b.description}`).join('\n'):'';
+  const blWants=m?m.budgetLines.filter(b=>b.cat==='wants').map(b=>`  • ${b.description}`).join('\n'):'';
+  const blSavings=m?m.budgetLines.filter(b=>b.cat==='savings').map(b=>`  • ${b.description}`).join('\n'):'';
+  const blContext=m?`Líneas de presupuesto del mes actual:
+🏠 Necesidades:\n${blNeeds}
+🎉 Discrecional:\n${blWants}
+💎 Ahorro:\n${blSavings}`:'';
+
 
   const prompt=`Analizá esta imagen. Puede ser un extracto bancario, resumen de tarjeta de crédito, screenshot de una app financiera, o lista de gastos.
 
@@ -3394,14 +3401,28 @@ Sin texto adicional, sin markdown, sin explicaciones. Solo el array JSON.`;
     const parsed=JSON.parse(match[0]);
     if(!Array.isArray(parsed)||!parsed.length)throw new Error('No se detectaron gastos en la imagen.');
 
-    aiRows=parsed.map((r,i)=>({
-      _id:i,
-      date:r.date||new Date().toISOString().split('T')[0],
-      description:r.description||'Gasto',
-      amount:Math.abs(parseFloat(r.amount)||0),
-      cat:['needs','wants','savings'].includes(r.suggestedCat)?r.suggestedCat:'wants',
-      budgetLineId:''
-    }));
+    aiRows=parsed.map((r,i)=>{
+      const desc=r.description||'Gasto';
+      const aiCat=['needs','wants','savings'].includes(r.suggestedCat)?r.suggestedCat:'wants';
+
+      // Run auto-categorization engine to find the best matching budget line
+      // Use a temp override so autoCatMatch looks in current month's lines
+      const acMatch=autoCatMatch(desc);
+
+      // Priority: 1) user-learned pattern  2) keyword DB match  3) AI suggestion
+      const finalCat = acMatch ? acMatch.cat : aiCat;
+      const finalLineId = acMatch?.lineId || '';
+
+      return {
+        _id:i,
+        date:r.date||new Date().toISOString().split('T')[0],
+        description:desc,
+        amount:Math.abs(parseFloat(r.amount)||0),
+        cat:finalCat,
+        budgetLineId:finalLineId,
+        _acSource: acMatch?.source||'ia'  // track where suggestion came from
+      };
+    });
 
     showAIStatus(`✅ Se detectaron ${aiRows.length} gasto${aiRows.length!==1?'s':''}. Revisá y editá antes de confirmar.`,'success');
     renderAIPreview();
@@ -3426,21 +3447,47 @@ function renderAIPreview(){
   const tbody=document.getElementById('aiPreviewBody');
   tbody.innerHTML=aiRows.map((r,i)=>{
     const linesForCat=m?m.budgetLines.filter(b=>b.cat===r.cat):[];
-    const lineOpts=`<option value="">Sin línea</option>${linesForCat.map(b=>`<option value="${b.id}" ${b.id==r.budgetLineId?'selected':''}>${esc(b.description.substring(0,22))}</option>`).join('')}`;
+    const lineOpts=`<option value="">Sin línea</option>${linesForCat.map(b=>`<option value="${b.id}" ${b.id==r.budgetLineId?'selected':''}>${esc(b.description.substring(0,24))}</option>`).join('')}`;
+    // Source badge
+    const srcBadge = r._acSource==='aprendido'
+      ? `<span style="font-size:.6rem;background:#c6f6d5;color:#276749;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">✓ aprendido</span>`
+      : r._acSource==='historial'
+      ? `<span style="font-size:.6rem;background:#bee3f8;color:#2b6cb0;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">📋 historial</span>`
+      : r._acSource==='reglas'
+      ? `<span style="font-size:.6rem;background:#fefcbf;color:#744210;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">🤖 reglas</span>`
+      : `<span style="font-size:.6rem;background:#e2e8f0;color:#718096;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">✨ IA</span>`;
     return`<tr id="air-${i}">
       <td><input type="date" value="${r.date}" onchange="aiRows[${i}].date=this.value;updateConfirmCount()"></td>
-      <td><input type="text" value="${esc(r.description)}" onchange="aiRows[${i}].description=this.value"></td>
+      <td>
+        <input type="text" value="${esc(r.description)}" onchange="aiRows[${i}].description=this.value;aiRecat(${i})">
+        ${srcBadge}
+      </td>
       <td><input type="number" value="${r.amount}" min="0" onchange="aiRows[${i}].amount=parseFloat(this.value)||0"></td>
       <td><select onchange="aiRows[${i}].cat=this.value;aiRows[${i}].budgetLineId='';renderAIPreview()">
         <option value="needs" ${r.cat==='needs'?'selected':''}>🏠 Necesidades</option>
         <option value="wants" ${r.cat==='wants'?'selected':''}>🎉 Discrecional</option>
         <option value="savings" ${r.cat==='savings'?'selected':''}>💎 Ahorro</option>
       </select></td>
-      <td><select onchange="aiRows[${i}].budgetLineId=this.value?parseInt(this.value):null">${lineOpts}</select></td>
+      <td><select onchange="aiRows[${i}].budgetLineId=this.value?parseInt(this.value):''">
+        ${lineOpts}
+      </select></td>
       <td><button class="del-row" onclick="aiRows.splice(${i},1);renderAIPreview()" title="Eliminar">✕</button></td>
     </tr>`;
   }).join('');
   updateConfirmCount();
+}
+
+// Re-run auto-cat when description changes in the AI preview table
+function aiRecat(i){
+  const r=aiRows[i];
+  if(!r) return;
+  const match=autoCatMatch(r.description);
+  if(match){
+    r.cat=match.cat;
+    r.budgetLineId=match.lineId||'';
+    r._acSource=match.source;
+    renderAIPreview();
+  }
 }
 
 function updateConfirmCount(){
