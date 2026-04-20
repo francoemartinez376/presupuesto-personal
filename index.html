@@ -622,7 +622,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
         </select>
       </div>
       <div class="field"><label>Línea del presupuesto</label><select id="eLine"></select></div>
-      <div class="field"><label>Monto</label><input type="number" id="eAmt" placeholder="0" min="0"></div>
+      <div class="field"><label>Monto</label><input type="number" id="eAmt" placeholder="0" min="0" oninput="renderSplitPreview()"></div>
       <button class="btn btn-g" onclick="addEntry()" style="white-space:nowrap">＋ Agregar</button>
     </div>
     <div style="margin-top:10px">
@@ -638,13 +638,19 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     </label>
     <div id="splitSection" style="display:none">
       <div class="split-section">
-        <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">PARTICIPANTES</div>
-        <div class="split-people" id="splitPeopleList"></div>
-        <div style="display:flex;gap:6px;margin-top:6px">
-          <input type="text" id="splitNewName" placeholder="Nombre…" style="flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem" onkeydown="if(event.key==='Enter'){addSplitPerson();event.preventDefault()}">
-          <button class="btn btn-g" onclick="addSplitPerson()" style="padding:6px 12px;font-size:.82rem">＋</button>
+        <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px">¿QUIÉNES PARTICIPAN?</div>
+        <!-- Chips de personas -->
+        <div id="splitChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
+        <!-- Input para agregar -->
+        <div style="display:flex;gap:6px">
+          <input type="text" id="splitNewName"
+            placeholder="Nombre (Enter para agregar)…"
+            style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem"
+            onkeydown="if(event.key==='Enter'){addSplitPerson();event.preventDefault()}"
+            oninput="renderSplitPreview()">
+          <button class="btn btn-g" onclick="addSplitPerson()" style="padding:7px 14px;font-size:.82rem">＋ Agregar</button>
         </div>
-        <div id="splitPreview"></div>
+        <div id="splitPreview" style="margin-top:10px"></div>
       </div>
     </div>
   </div>
@@ -1598,38 +1604,57 @@ function filterEntryLines(){
 }
 
 // ═══════════════ SPLIT EN FORM DE GASTOS ═══════════════
-let _splitPeople=['Yo'];
+let _splitPeople=['Yo']; // siempre empieza con "Yo"
+
 function toggleSplitSection(){
   const on=document.getElementById('eSplitToggle').checked;
   document.getElementById('splitSection').style.display=on?'block':'none';
-  if(on){_splitPeople=['Yo'];renderSplitPeople();renderSplitPreview();}
+  if(on){_splitPeople=['Yo'];renderSplitChips();renderSplitPreview();}
 }
-function renderSplitPeople(){
-  const list=document.getElementById('splitPeopleList');if(!list)return;
-  list.innerHTML=_splitPeople.map((p,i)=>`
-    <div class="split-person-row">
-      <input value="${p}" oninput="_splitPeople[${i}]=this.value;renderSplitPreview()" style="flex:1;padding:6px 10px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem">
-      ${i>0?`<button onclick="_splitPeople.splice(${i},1);renderSplitPeople();renderSplitPreview()" style="background:none;border:none;color:var(--r);cursor:pointer;font-size:1.1rem">✕</button>`:'<span style="width:24px"></span>'}
-    </div>`).join('');
+
+function renderSplitChips(){
+  const container=document.getElementById('splitChips');if(!container)return;
+  container.innerHTML=_splitPeople.map((p,i)=>{
+    const isMe=i===0;
+    return `<div style="display:inline-flex;align-items:center;gap:5px;background:${isMe?'#ebf4ff':'#f0f4ff'};border:1.5px solid ${isMe?'#90cdf4':'#bee3f8'};border-radius:20px;padding:5px 12px;font-size:.82rem;font-weight:700;color:${isMe?'var(--pri)':'#4a5568'}">
+      ${isMe?'👤 ':''}${p}
+      ${isMe
+        ?''
+        :`<button onclick="splitRemove(${i})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:.9rem;line-height:1;padding:0 0 0 2px" title="Quitar">✕</button>`
+      }
+    </div>`;
+  }).join('');
 }
+
+function splitRemove(i){
+  _splitPeople.splice(i,1);
+  renderSplitChips();renderSplitPreview();
+}
+
 function addSplitPerson(){
   const inp=document.getElementById('splitNewName');
-  const name=inp.value.trim();if(!name)return;
-  _splitPeople.push(name);inp.value='';
-  renderSplitPeople();renderSplitPreview();
+  const raw=inp.value.trim();
+  if(!raw)return;
+  // permite varios separados por coma: "Nico, Damian, Lau"
+  const names=raw.split(',').map(n=>n.trim()).filter(n=>n&&!_splitPeople.includes(n));
+  _splitPeople.push(...names);
+  inp.value='';
+  renderSplitChips();renderSplitPreview();
+  inp.focus();
 }
+
 function renderSplitPreview(){
   const prev=document.getElementById('splitPreview');if(!prev)return;
-  const total=parseFloat(document.getElementById('eAmt').value)||0;
+  const total=parseFloat(document.getElementById('eAmt')?document.getElementById('eAmt').value:0)||0;
   const people=_splitPeople.filter(p=>p.trim());
-  if(!people.length||!total){prev.innerHTML='';return;}
+  if(people.length<2||!total){prev.innerHTML='';return;}
   const perHead=total/people.length;
-  const others=people.slice(1).filter(p=>p.trim());
+  const others=people.slice(1);
   prev.innerHTML=`<div class="split-preview">
-    <div class="sp-lbl">Resultado</div>
-    <div class="sp-mine">Tu parte: ${fmt(perHead)}</div>
-    ${others.length?`<div class="sp-debt">Te deben: ${others.map(p=>`<span>${p}: ${fmt(perHead)}</span>`).join('')}</div>`:''}
-    <div style="font-size:.7rem;color:var(--muted);margin-top:4px">El gasto que se registra es tu parte (${fmt(perHead)}) sobre el total de ${fmt(total)}</div>
+    <div class="sp-lbl">Cómo queda dividido (${people.length} personas)</div>
+    <div class="sp-mine">💰 Tu parte: <strong>${fmt(perHead)}</strong></div>
+    ${others.length?`<div class="sp-debt" style="margin-top:6px">📲 Te deben: ${others.map(p=>`<span>${p}: ${fmt(perHead)}</span>`).join('')}</div>`:''}
+    <div style="font-size:.7rem;color:var(--muted);margin-top:6px">Se registra solo tu parte (${fmt(perHead)}) · Total del gasto: ${fmt(total)}</div>
   </div>`;
 }
 
