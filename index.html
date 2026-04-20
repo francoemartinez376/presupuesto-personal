@@ -2990,26 +2990,27 @@ function computeUSD(mk){
   const m=S.months[mkey];if(!m)return null;
   const monthRef=mkey+'-01';
 
-  // INCOME in USD — each income uses month's historical rate (salaries come once a month)
-  const monthRate=getRateForDate(monthRef);
-  const incomeUSD=m.incomes.reduce((s,i)=>{
-    const rate=i.usdRateAtTime||monthRate;
-    return s+(i.actual||0)/rate;
-  },0);
+  // For current month: always use live rate. For past months: use historical rate.
+  const isCurrentMk=mkey===S.currentMonth;
+  const liveRate=getCurrentUSDRate();
+  const monthRate=isCurrentMk ? liveRate : (getRateForDate(monthRef)||liveRate);
+  const incomeUSD=m.incomes.reduce((s,i)=>s+(i.actual||0)/monthRate,0);
   const incomePlanUSD=m.incomes.reduce((s,i)=>s+(i.planned||0)/monthRate,0);
 
   // EXPENSES in USD — each entry uses its own stored rate (historical)
-  const entries=S.dailyEntries.filter(e=>e.monthKey===mkey);
+  // Exclude income entries (cat:'income') — they are NOT expenses
+  const entries=S.dailyEntries.filter(e=>e.monthKey===mkey&&e.cat!=='income');
   const cuotaEntries=getCuotaEntriesForMonth(mkey);
   const allEntries=[...entries,...cuotaEntries];
 
   let expNeedsUSD=0,expWantsUSD=0,expSavingsUSD=0;
   allEntries.forEach(e=>{
-    const rate=e.usdRateAtTime||getRateForDate(e.date);
+    if(e.cat==='income') return; // safety guard
+    const rate=isCurrentMk ? liveRate : (e.usdRateAtTime||getRateForDate(e.date)||liveRate);
     const usdAmt=e.amount/rate;
     if(e.cat==='needs')expNeedsUSD+=usdAmt;
     else if(e.cat==='wants')expWantsUSD+=usdAmt;
-    else expSavingsUSD+=usdAmt;
+    else if(e.cat==='savings')expSavingsUSD+=usdAmt;
   });
   const expTotalUSD=expNeedsUSD+expWantsUSD+expSavingsUSD;
   const netUSD=incomeUSD-expTotalUSD;
@@ -3111,18 +3112,23 @@ function renderUSDPanel(){
 
 // ═══════════════════════════ CURRENCY & RATES ═══════════════════════════
 function getCurrentUSDRate(){
-  if(S.settings?.usdRate)return S.settings.usdRate;
+  // Always prefer the live-fetched rate over any stored/stale usdRate
   const type=S.settings?.rateType||'blue';
-  return S.settings?.currentRates?.[type]||1200;
+  const liveRate=S.settings?.currentRates?.[type];
+  if(liveRate&&liveRate>0) return liveRate;
+  // Fallback to manually stored rate (only if no live rate available)
+  if(S.settings?.usdRate&&S.settings.usdRate>0) return S.settings.usdRate;
+  return 1200;
 }
 
 function getEntryUSDValue(entry){
   if(!entry||!entry.amount)return 0;
-  // Prioridad: 1) tasa guardada al momento del gasto  2) tasa histórica de ese día  3) tasa actual
-  const rate=entry.usdRateAtTime
-    ||getRateForDate(entry.date)
-    ||getCurrentUSDRate()
-    ||1090;
+  // Current month: always use live blue rate (stale rates in usdRateAtTime are ignored)
+  // Past months: use the rate stored at transaction time for historical accuracy
+  const liveRate=getCurrentUSDRate();
+  const isCurrentMonth=entry.monthKey===S.currentMonth;
+  if(isCurrentMonth&&liveRate>0) return entry.amount/liveRate;
+  const rate=entry.usdRateAtTime||getRateForDate(entry.date)||liveRate;
   return entry.amount/rate;
 }
 
