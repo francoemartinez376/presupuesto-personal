@@ -949,56 +949,45 @@ function mkBudgetLines(p){
 }
 
 function mkDemoState(){
-  const months={};
-
-  // ── ABRIL 2026 — datos reales ──
-  const BL2={CELU:1001,ARCA:1002,DEUDA_ARCA:1003,VERSACE:1004,GYM2:1005,INTERNET2:1006,NARANJA:1007,IMAGEN:1008,SUSCRIP2:1009,CLAUDE_AI:1010,UBERS:1011,VARIOS2:1012,SALIDAS2:1013,COMIDAS2:1014,USD_COLCHON:1015,USD_PEUGEOT:1016};
-  months['2026-04']={key:'2026-04',label:'Abril 2026',currency:'ARS',initialBalance:0,rules:{needs:50,wants:30,savings:20},
-    incomes:[{id:20,description:'Sueldo',planned:6300000,actual:0}],
-    budgetLines:[
-      {id:BL2.CELU,       cat:'needs',  description:'Personal (CELU)',          planned:68000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.ARCA,       cat:'needs',  description:'ARCA',                     planned:65000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.DEUDA_ARCA, cat:'needs',  description:'DEUDA ARCA',               planned:95000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.VERSACE,    cat:'needs',  description:'VERSACE LAUTA',            planned:40000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.GYM2,       cat:'needs',  description:'GYM',                      planned:92000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.INTERNET2,  cat:'needs',  description:'INTERNET',                 planned:20000,   dueDate:'',goalId:null,paid:false},
-      {id:BL2.NARANJA,    cat:'needs',  description:'NARANJA X',                planned:250000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.IMAGEN,     cat:'needs',  description:'IMAGEN PERSONAL',          planned:100000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.SUSCRIP2,   cat:'wants',  description:'Suscripciones (Netflix...)',planned:70000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.CLAUDE_AI,  cat:'wants',  description:'Claude',                   planned:150000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.UBERS,      cat:'wants',  description:'Ubers',                    planned:200000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.VARIOS2,    cat:'wants',  description:'Varios',                   planned:200000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.SALIDAS2,   cat:'wants',  description:'Salidas',                  planned:400000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.COMIDAS2,   cat:'wants',  description:'Comidas',                  planned:600000,  dueDate:'',goalId:null,paid:false},
-      {id:BL2.USD_COLCHON,cat:'savings',description:'Compra USD (Colchón)',     planned:1500000, dueDate:'',goalId:9001,paid:false},
-      {id:BL2.USD_PEUGEOT,cat:'savings',description:'Compra USD (Peugeot 308)',planned:1500000, dueDate:'',goalId:9002,paid:false},
-    ]};
-
-  // Historical USD blue rates (approximate)
-  const RATES={'2026-02':960,'2026-03':1010,'2026-04':1090};
-
-  let eid=5000;
-  const de=[];
-  const e=(date,mk,cat,desc,amt,blId)=>de.push({id:++eid,date,monthKey:mk,cat,description:desc,amount:amt,budgetLineId:blId,usdRateAtTime:RATES[mk]||1000});
-
-  // ── ABRIL 2026 — datos reales (el usuario irá registrando sus gastos) ──
-
-  return{
-    currentMonth:'2026-04',
-    months,
-    dailyEntries:[],
-    savings:{
-      goals:[
-        {id:9001,name:'Colchón',      targetAmount:10000,initialSavings:300,startDate:'2026-01-01',targetDate:'2026-09-27'},
-        {id:9002,name:'Peugeot 308',  targetAmount:5000, initialSavings:0,  startDate:'2026-01-01',targetDate:'2026-09-27'},
-      ],
-      transactions:[]
-    },
-    settings:{usdRate:null,rateType:'blue',inflationRates:{},currentRates:{blue:null,oficial:null,mep:null},ratesLastFetch:null,inflLastFetch:null,historicalRates:{}},
-    cuotas:[
-      {id:7001,description:'Smart TV Samsung 55"',totalAmount:480000,numCuotas:12,startMonth:'2026-01',cat:'wants',budgetLineId:null},
-      {id:7002,description:'Colchón Piero',       totalAmount:360000,numCuotas:6, startMonth:'2026-02',cat:'needs',budgetLineId:null},
+  // Template genérico para nuevos usuarios — sin datos personales, sin transacciones
+  const m = new Date().toISOString().substring(0,7); // mes actual, ej: "2026-04"
+  const months = {};
+  months[m] = {
+    key: m,
+    label: '',
+    currency: 'ARS',
+    initialBalance: 0,
+    rules: {needs:50, wants:30, savings:20},
+    incomes: [{id:1, description:'Sueldo / Ingresos', planned:0, actual:0}],
+    budgetLines: [
+      // Necesidades
+      {id:101, cat:'needs',   description:'Alquiler / Expensas',          planned:0, dueDate:'', goalId:null, paid:false},
+      {id:102, cat:'needs',   description:'Supermercado',                 planned:0, dueDate:'', goalId:null, paid:false},
+      {id:103, cat:'needs',   description:'Servicios (luz, gas, internet)',planned:0, dueDate:'', goalId:null, paid:false},
+      {id:104, cat:'needs',   description:'Transporte',                   planned:0, dueDate:'', goalId:null, paid:false},
+      {id:105, cat:'needs',   description:'Salud / Farmacia',             planned:0, dueDate:'', goalId:null, paid:false},
+      // Ocio / Discrecional
+      {id:201, cat:'wants',   description:'Salidas / Restaurantes',       planned:0, dueDate:'', goalId:null, paid:false},
+      {id:202, cat:'wants',   description:'Entretenimiento / Streaming',  planned:0, dueDate:'', goalId:null, paid:false},
+      {id:203, cat:'wants',   description:'Ropa / Calzado',               planned:0, dueDate:'', goalId:null, paid:false},
+      {id:204, cat:'wants',   description:'Varios',                       planned:0, dueDate:'', goalId:null, paid:false},
+      // Ahorro
+      {id:301, cat:'savings', description:'Ahorro mensual',               planned:0, dueDate:'', goalId:null, paid:false},
+      {id:302, cat:'savings', description:'Fondo de emergencia',          planned:0, dueDate:'', goalId:null, paid:false},
     ]
+  };
+  return {
+    currentMonth: m,
+    months,
+    dailyEntries: [],
+    savings: {
+      goals: [
+        {id:9001, name:'Fondo de emergencia', targetAmount:1000, initialSavings:0, startDate: new Date().toISOString().split('T')[0], targetDate:''},
+      ],
+      transactions: []
+    },
+    settings: {usdRate:null, rateType:'blue', inflationRates:{}, currentRates:{blue:null,oficial:null,mep:null}, ratesLastFetch:null, inflLastFetch:null, historicalRates:{}},
+    cuotas: []
   };
 }
 
@@ -1030,21 +1019,49 @@ const SESSION_KEY = 'pp_session_v1';
 let _userCode = '';
 let _displayName = '';
 
+function _cookieGet(name){
+  const m=document.cookie.match('(?:^|; )'+name+'=([^;]*)');
+  return m?decodeURIComponent(m[1]):null;
+}
+function _cookieSet(name,value,days){
+  const d=new Date(); d.setTime(d.getTime()+days*864e5);
+  document.cookie=`${name}=${encodeURIComponent(value)};expires=${d.toUTCString()};path=/;SameSite=Lax`;
+}
+function _cookieDel(name){
+  document.cookie=`${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/`;
+}
+
 function loadSession(){
+  // 1. Intentar localStorage
   try{
     const s = JSON.parse(localStorage.getItem(SESSION_KEY)||'null');
     if(s?.userCode && s?.displayName){ _userCode=s.userCode; _displayName=s.displayName; return true; }
+  }catch(e){}
+  // 2. Fallback: cookie (sobrevive si el browser limpia localStorage)
+  try{
+    const c=_cookieGet(SESSION_KEY);
+    const s=JSON.parse(c||'null');
+    if(s?.userCode && s?.displayName){
+      _userCode=s.userCode; _displayName=s.displayName;
+      // Re-sincronizar localStorage desde la cookie
+      localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+      return true;
+    }
   }catch(e){}
   return false;
 }
 
 function saveSession(userCode, displayName){
   _userCode = userCode; _displayName = displayName;
-  localStorage.setItem(SESSION_KEY, JSON.stringify({userCode, displayName}));
+  const val = JSON.stringify({userCode, displayName});
+  localStorage.setItem(SESSION_KEY, val);
+  // Cookie de 365 días como respaldo
+  _cookieSet(SESSION_KEY, val, 365);
 }
 
 function clearSession(){
   localStorage.removeItem(SESSION_KEY);
+  _cookieDel(SESSION_KEY);
   _userCode=''; _displayName='';
 }
 
@@ -1090,26 +1107,37 @@ function switchAuthTab(tab){
   if(tl){tl.style.background=isLogin?'#1a365d':'transparent';tl.style.color=isLogin?'#fff':'#718096';}
   if(tr){tr.style.background=!isLogin?'#1a365d':'transparent';tr.style.color=!isLogin?'#fff':'#718096';}
   const form=document.getElementById('authForm');if(!form)return;
-  const inp=(id,type,placeholder,label)=>`
-    <div style="margin-bottom:14px">
-      <label style="font-size:.68rem;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">${label}</label>
-      <input id="${id}" type="${type}" placeholder="${placeholder}" autocomplete="${type==='password'?(isLogin?'current-password':'new-password'):'username'}"
-        style="width:100%;padding:11px 13px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .15s"
-        onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#e2e8f0'"
-        onkeydown="if(event.key==='Enter')submitAuth()">
-    </div>`;
+  const iStyle='width:100%;padding:11px 13px;border:2px solid #e2e8f0;border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box';
+  // Usar <form> real para que los gestores de contraseñas (Google, Safari) detecten y guarden
   form.innerHTML=`
-    ${inp('authUser','text','Ej: franco, nico…','Usuario')}
-    ${inp('authPass','password','Tu contraseña','Contraseña')}
-    ${!isLogin?inp('authPass2','password','Repetí la contraseña','Repetir contraseña'):''}
-    <button onclick="submitAuth()" id="authBtn"
-      style="width:100%;background:#48bb78;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.97rem;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s"
-      onmouseover="this.style.background='#38a169'" onmouseout="this.style.background='#48bb78'">
-      ${isLogin?'🔓 Entrar':'✨ Crear mi cuenta'}
-    </button>`;
+    <form id="authFormReal" autocomplete="on" onsubmit="event.preventDefault();submitAuth()" style="margin:0">
+      <div style="margin-bottom:14px">
+        <label style="font-size:.68rem;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">Usuario</label>
+        <input id="authUser" name="username" type="text" placeholder="Ej: franco, nico…"
+          autocomplete="username" style="${iStyle}"
+          onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:.68rem;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">Contraseña</label>
+        <input id="authPass" name="password" type="password" placeholder="Tu contraseña"
+          autocomplete="${isLogin?'current-password':'new-password'}" style="${iStyle}"
+          onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>
+      ${!isLogin?`<div style="margin-bottom:14px">
+        <label style="font-size:.68rem;font-weight:700;color:#718096;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px">Repetir contraseña</label>
+        <input id="authPass2" name="password2" type="password" placeholder="Repetí la contraseña"
+          autocomplete="new-password" style="${iStyle}"
+          onfocus="this.style.borderColor='#1a365d'" onblur="this.style.borderColor='#e2e8f0'">
+      </div>`:''}
+      <button type="submit" id="authBtn"
+        style="width:100%;background:#48bb78;color:#fff;border:none;border-radius:10px;padding:13px;font-size:.97rem;font-weight:700;cursor:pointer;margin-top:4px;transition:background .15s"
+        onmouseover="this.style.background='#38a169'" onmouseout="this.style.background='#48bb78'">
+        ${isLogin?'🔓 Entrar':'✨ Crear mi cuenta'}
+      </button>
+    </form>`;
   document.getElementById('authMsg').style.display='none';
-  setTimeout(()=>document.getElementById('authUser')?.focus(),50);
   document.getElementById('authForm')._tab=tab;
+  setTimeout(()=>document.getElementById('authUser')?.focus(),50);
 }
 
 async function submitAuth(){
