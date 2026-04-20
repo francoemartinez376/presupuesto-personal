@@ -863,17 +863,9 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     <h2>📷 Importar gastos desde imagen</h2>
     <p>Subí un screenshot de tu resumen de tarjeta, extracto bancario, app de homebanking, o cualquier lista de gastos. La IA extrae y categoriza todo automáticamente, vos confirmás antes de agregar.</p>
 
-    <!-- API Key -->
-    <div class="ai-key-wrap">
-      <div class="field" style="flex:1">
-        <label>🔑 API Key de Anthropic</label>
-        <input type="password" id="aiKeyInput" placeholder="sk-ant-api03-…" autocomplete="off">
-      </div>
-      <button class="btn btn-pri" onclick="saveAIKey()" style="margin-bottom:1px;white-space:nowrap;font-size:.78rem;padding:7px 12px">Guardar</button>
-    </div>
-    <p style="font-size:.73rem;color:var(--muted);margin-top:-10px;margin-bottom:16px">
-      🔒 La clave se guarda solo en tu navegador (localStorage), nunca se envía a ningún servidor nuestro.
-      Conseguila en <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--pri)">console.anthropic.com</a>
+    <!-- AI powered by shared backend -->
+    <p style="font-size:.73rem;color:var(--muted);margin-bottom:16px;background:#f0fff4;border-radius:8px;padding:8px 12px;color:#276749">
+      ✨ La IA corre en el servidor — no necesitás ninguna clave. Solo subí la imagen y listo.
     </p>
 
     <!-- Drop zone -->
@@ -2516,9 +2508,6 @@ let aiImageB64=null, aiImageType=null, aiRows=[];
 
 function openAI(){
   document.getElementById('aiOverlay').style.display='flex';
-  // Restore saved key
-  const saved=localStorage.getItem('pp_claude_key')||'';
-  document.getElementById('aiKeyInput').value=saved;
   // Reset state
   aiImageB64=null;aiImageType=null;aiRows=[];
   document.getElementById('dropContent').innerHTML='<div style="font-size:2rem;margin-bottom:6px">🖼️</div><p style="font-weight:700;color:var(--pri)">Arrastrá una imagen o hacé click para seleccionar</p><p>JPG, PNG, WEBP — screenshot de extracto, resumen de tarjeta, etc.</p>';
@@ -2532,12 +2521,7 @@ function openAI(){
 
 function closeAI(){document.getElementById('aiOverlay').style.display='none';}
 
-function saveAIKey(){
-  const k=document.getElementById('aiKeyInput').value.trim();
-  if(k)localStorage.setItem('pp_claude_key',k);
-  document.getElementById('aiHint').textContent='✓ Clave guardada';
-  setTimeout(()=>{document.getElementById('aiHint').textContent=aiImageB64?'Listo para analizar':'Seleccioná una imagen para continuar';},1500);
-}
+// saveAIKey removed — key is managed server-side
 
 function handleDrop(ev){
   ev.preventDefault();ev.currentTarget.classList.remove('drag');
@@ -2563,16 +2547,13 @@ function loadAIFile(file){
 }
 
 async function analyzeImage(){
-  const key=(document.getElementById('aiKeyInput').value.trim())||localStorage.getItem('pp_claude_key')||'';
-  if(!key){showAIStatus('Ingresá tu API Key de Anthropic primero.','error');return;}
   if(!aiImageB64){showAIStatus('Seleccioná una imagen primero.','error');return;}
-  if(key)localStorage.setItem('pp_claude_key',key);
 
   const btn=document.getElementById('btnAnalyze');
   btn.disabled=true;
   document.getElementById('analyzeIcon').textContent='⏳';
   document.getElementById('analyzeText').textContent='Analizando…';
-  showAIStatus('Enviando imagen a Claude… puede tardar 10-20 segundos.','loading');
+  showAIStatus('Enviando imagen a la IA… puede tardar 10-20 segundos.','loading');
   document.getElementById('aiResults').style.display='none';
 
   // Build list of budget line names for context
@@ -2593,34 +2574,23 @@ ${blContext?`Líneas de presupuesto disponibles del mes actual para referencia:\
 Sin texto adicional, sin markdown, sin explicaciones. Solo el array JSON.`;
 
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const resp=await fetch('/api/ai',{
       method:'POST',
-      headers:{
-        'x-api-key':key,
-        'anthropic-version':'2023-06-01',
-        'content-type':'application/json',
-        'anthropic-dangerous-direct-browser-access':'true'
-      },
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-opus-4-5',
-        max_tokens:2000,
-        messages:[{
-          role:'user',
-          content:[
-            {type:'image',source:{type:'base64',media_type:aiImageType,data:aiImageB64}},
-            {type:'text',text:prompt}
-          ]
-        }]
+        imageBase64:aiImageB64,
+        imageType:aiImageType,
+        prompt
       })
     });
 
     if(!resp.ok){
       const err=await resp.json().catch(()=>({}));
-      throw new Error(err.error?.message||`HTTP ${resp.status}`);
+      throw new Error(err.error||`HTTP ${resp.status}`);
     }
 
     const data=await resp.json();
-    const raw=data.content?.[0]?.text||'';
+    const raw=data.text||'';
 
     // Extract JSON array from response
     const match=raw.match(/\[[\s\S]*\]/);
