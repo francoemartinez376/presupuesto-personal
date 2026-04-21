@@ -558,6 +558,90 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   #pane-daily .add-entry-form{position:sticky;top:95px;z-index:80;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 }
 
+/* ══════════════════ DARK MODE ══════════════════ */
+[data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--bdr:#334155;--pri:#60a5fa;--pri2:#3b82f6}
+[data-theme="dark"] body{background:var(--bg);color:var(--text)}
+[data-theme="dark"] .nav{background:#0f172a;border-bottom:1px solid #1e293b}
+[data-theme="dark"] .nav-brand{color:#e2e8f0}
+[data-theme="dark"] .month-bar{background:#1e293b;border-color:#334155}
+[data-theme="dark"] .month-name{color:#60a5fa}
+[data-theme="dark"] .month-arrow{border-color:#334155;color:#94a3b8}
+[data-theme="dark"] .month-arrow:hover{background:#3b82f6;border-color:#3b82f6}
+[data-theme="dark"] .card,[data-theme="dark"] .kpi,[data-theme="dark"] .stat,[data-theme="dark"] .hoy-card,[data-theme="dark"] .goal-card,[data-theme="dark"] .cuota-card,[data-theme="dark"] .venc-item{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+[data-theme="dark"] .ct{color:#93c5fd}
+[data-theme="dark"] .field input,[data-theme="dark"] .field select,.field select{background:var(--card);color:var(--text);border-color:var(--bdr)}
+[data-theme="dark"] .ei{color:var(--text);background:transparent}
+[data-theme="dark"] .add-entry-form,[data-theme="dark"] .add-form,[data-theme="dark"] .cuota-form{background:#0f172a;border-color:#334155}
+[data-theme="dark"] .day-hdr{background:#0f172a}
+[data-theme="dark"] .search-bar{background:var(--card)}
+[data-theme="dark"] .search-bar input,[data-theme="dark"] .search-bar select{background:#0f172a;color:var(--text);border-color:#334155}
+[data-theme="dark"] tbody tr:hover{background:#263347}
+[data-theme="dark"] tbody td{border-color:#334155}
+[data-theme="dark"] thead th{background:#0f172a;color:#94a3b8;border-color:#334155}
+[data-theme="dark"] tfoot td{background:#0f172a;border-color:#334155}
+[data-theme="dark"] .settings-modal,[data-theme="dark"] .ai-modal{background:#1e293b;color:var(--text)}
+[data-theme="dark"] .settings-modal h2{color:#93c5fd}
+[data-theme="dark"] .settings-section{border-color:#334155}
+[data-theme="dark"] .rate-box{background:#0f172a}
+[data-theme="dark"] .drop-zone{background:#0f172a;border-color:#334155}
+[data-theme="dark"] .mob-nav{background:#0f172a;border-top-color:#334155}
+[data-theme="dark"] .mob-nav-more-panel{background:#0f172a;border-top-color:#334155}
+[data-theme="dark"] .entry-row:hover{background:#263347}
+[data-theme="dark"] .cat-hdr.needs{background:#0c2a3a;border-left-color:#4299e1}
+[data-theme="dark"] .cat-hdr.wants{background:#2a1a00;border-left-color:#ed8936}
+[data-theme="dark"] .cat-hdr.savings{background:#0a2318;border-left-color:#48bb78}
+[data-theme="dark"] .venc-item.overdue{background:#2a0f0f}
+[data-theme="dark"] .venc-item.soon{background:#2a1a00}
+[data-theme="dark"] .venc-item.upcoming{background:#0c1f2a}
+[data-theme="dark"] .venc-item.paid{background:#0a2318}
+[data-theme="dark"] .cat-prog{background:#334155}
+[data-theme="dark"] .rbadge.ok{background:#065f46;color:#6ee7b7}
+[data-theme="dark"] .rbadge.err{background:#7f1d1d;color:#fca5a5}
+[data-theme="dark"] .split-section{background:#0f172a;border-color:#334155}
+[data-theme="dark"] .toggle-pill{background:#334155}
+[data-theme="dark"] .toggle-pill button{color:#94a3b8}
+[data-theme="dark"] .toggle-pill button.active{background:#3b82f6;color:#fff}
+[data-theme="dark"] .ai-preview-tbl th{background:#0f172a}
+[data-theme="dark"] .ai-preview-tbl td{border-color:#334155}
+[data-theme="dark"] .ai-preview-tbl input,[data-theme="dark"] .ai-preview-tbl select{background:#0f172a;color:var(--text);border-color:#334155}
+[data-theme="dark"] .prog{background:#334155}
+[data-theme="dark"] .learnOverlay-inner{background:#1e293b!important}
+[data-theme="dark"] .sync-ok{background:#065f46;color:#6ee7b7}
+[data-theme="dark"] .sync-pending{background:#78350f;color:#fcd34d}
+
+/* ══════════════════ FACTURACIÓN ══════════════════ */
+.factura-card{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid var(--bdr)}
+.factura-card.pendiente{border-left-color:var(--o)}
+.factura-card.cobrada{border-left-color:var(--g)}
+.factura-card.vencida{border-left-color:var(--r)}
+.factura-card.anulada{border-left-color:var(--muted);opacity:.55}
+.factura-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
+.factura-concepto{font-size:.92rem;font-weight:700;color:var(--pri);flex:1}
+.factura-monto{font-size:1.05rem;font-weight:800}
+.factura-meta{font-size:.72rem;color:var(--muted);margin-bottom:6px;line-height:1.5}
+.factura-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.factura-status{font-size:.67rem;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:3px}
+.factura-status.pendiente{background:#feebc8;color:#7b341e}
+.factura-status.cobrada{background:#c6f6d5;color:#276749}
+.factura-status.vencida{background:#fed7d7;color:#9b2c2c}
+.factura-status.anulada{background:#e2e8f0;color:#718096}
+.fact-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.fact-form-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:10px;align-items:flex-end}
+@media(max-width:768px){.fact-form-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.fact-kpi-row{grid-template-columns:1fr 1fr!important}}
+
+/* ══════════════════ PRO PROGRESS BARS ══════════════════ */
+.prog-pro-section{margin-bottom:16px}
+.prog-pro-cat{margin-bottom:18px}
+.prog-pro-cat-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid var(--bdr)}
+.prog-pro-card{background:var(--card);border-radius:10px;padding:11px 14px;margin-bottom:6px;box-shadow:0 1px 2px rgba(0,0,0,.07);display:flex;flex-direction:column;gap:4px}
+.prog-pro-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.prog-pro-name{font-size:.82rem;font-weight:600;color:var(--text);flex:1}
+.prog-pro-pct{font-size:.82rem;font-weight:800;white-space:nowrap}
+.prog-pro-bar{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden}
+.prog-pro-fill{height:100%;border-radius:4px;transition:width .5s}
+.prog-pro-amounts{display:flex;justify-content:space-between;font-size:.67rem;color:var(--muted)}
+
 /* ── Calendario ── */
 .cal-dow{text-align:center;font-size:.7rem;font-weight:700;color:var(--muted);padding:4px 0}
 .cal-day{border-radius:10px;padding:6px 4px;min-height:72px;background:var(--bg);cursor:pointer;transition:all .15s;position:relative;border:2px solid transparent}
@@ -622,6 +706,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     <div class="nt" onclick="tab('savings',this)">🎯 Plan de Ahorro</div>
     <div class="nt" onclick="tab('cuotas',this)">🗂️ Cuotas</div>
     <div class="nt" onclick="tab('dividir',this)">🤝 Dividir</div>
+    <div class="nt" onclick="tab('fact',this)">🧾 Facturación</div>
   </div>
   <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
     <!-- Live rate badge -->
@@ -642,6 +727,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     </div>
     <span id="syncBadge" class="sync-badge" style="margin-left:8px;display:none"></span>
     <button class="settings-btn" onclick="showMyLink()" id="myLinkBtn" title="Mi cuenta" style="font-size:.75rem;padding:6px 10px;background:linear-gradient(135deg,#1a365d,#2a4a7f);color:#fff;border-radius:8px;font-weight:700">👤 <span id="navUserName">Mi link</span></button>
+    <button class="settings-btn" id="darkBtn" onclick="toggleDark()" title="Modo oscuro">🌙</button>
     <button class="settings-btn" onclick="openSettings()" title="Configuración">⚙️</button>
   </div>
 </nav>
@@ -674,6 +760,9 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   </div>
   <div class="mob-nav-more-item" id="mnm-dividir" onclick="tab('dividir',null,'dividir');closeMobMore()">
     <span class="mn-ico">🤝</span> Dividir
+  </div>
+  <div class="mob-nav-more-item" id="mnm-fact" onclick="tab('fact',null,'fact');closeMobMore()">
+    <span class="mn-ico">🧾</span> Facturación
   </div>
   <div class="mob-nav-more-item" onclick="openSettings();closeMobMore()">
     <span class="mn-ico">⚙️</span> Configuración
@@ -788,6 +877,15 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     <div style="margin-top:16px;overflow-x:auto" id="usdTable"></div>
   </div>
 
+  <!-- Comparación mes a mes -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div class="ct" style="margin-bottom:0">📊 Comparación mes a mes — Gastos por categoría</div>
+      <span style="font-size:.72rem;color:var(--muted)">Últimos 8 meses acumulado</span>
+    </div>
+    <div class="ch md"><canvas id="cMonthComp"></canvas></div>
+  </div>
+
   <!-- Interconnect -->
   <div class="cp" id="cpanel"></div>
 </div>
@@ -820,6 +918,12 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     </div>
   </div>
   <div class="sg" id="statsGrid"></div>
+
+  <!-- Pro Progress Bars -->
+  <div class="card prog-pro-section" id="progProCard">
+    <div class="ct">📊 Progreso por línea — Planificado vs Real</div>
+    <div id="progProWrap"></div>
+  </div>
   <!-- Incomes -->
   <div class="card">
     <div class="ct">💵 Ingresos del Mes</div>
@@ -1023,6 +1127,42 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
       <tbody id="txBody"></tbody>
     </table></div>
   </div>
+</div>
+
+<!-- ══════ FACTURACIÓN ══════ -->
+<div id="pane-fact" class="pane">
+  <!-- KPIs -->
+  <div class="fact-kpi-row" id="factKpiRow"></div>
+
+  <!-- Nueva factura -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="ct">➕ Nueva Factura</div>
+    <div class="fact-form-grid">
+      <div class="field"><label>Concepto / Cliente</label><input type="text" id="fConcepto" placeholder="Ej: Consultoría abril, Diseño logo…"></div>
+      <div class="field"><label>Monto</label><input type="number" id="fMonto" placeholder="0" min="0"></div>
+      <div class="field"><label>Moneda</label>
+        <select id="fMoneda"><option value="ARS">$ ARS</option><option value="USD">USD</option></select>
+      </div>
+      <div class="field"><label>Fecha emisión</label><input type="date" id="fFecha"></div>
+      <div class="field"><label>Vencimiento</label><input type="date" id="fVenc"></div>
+      <div class="field"><label>N° Factura</label><input type="text" id="fNumero" placeholder="0001-0001234"></div>
+      <button class="btn btn-g" onclick="addFactura()" style="white-space:nowrap;margin-bottom:1px">🧾 Agregar</button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="toggle-pill" id="factFilterPill">
+      <button class="active" onclick="setFactFilter('todas')">Todas</button>
+      <button onclick="setFactFilter('pendiente')">⏳ Pendientes</button>
+      <button onclick="setFactFilter('cobrada')">✅ Cobradas</button>
+      <button onclick="setFactFilter('vencida')">🔴 Vencidas</button>
+    </div>
+    <span id="factCount" style="font-size:.75rem;color:var(--muted)"></span>
+  </div>
+
+  <!-- Lista de facturas -->
+  <div id="factList"></div>
 </div>
 
 </div><!-- /main -->
@@ -1750,6 +1890,7 @@ function tab(name,el){
   if(name==='savings')renderSavings();
   if(name==='cuotas')renderCuotas();
   if(name==='dividir')renderDividir();
+  if(name==='fact')renderFacturas();
   // close more panel and scroll to top
   closeMobMore();
   window.scrollTo(0,0);
@@ -1776,6 +1917,7 @@ function renderDash(){
   renderGauges(c);
   renderTopChart(c);
   renderGoalsDash();
+  renderMonthComparison();
   renderConnect(c);
 }
 
@@ -1982,6 +2124,7 @@ function renderBudget(){
   renderRuleBadge();renderStats();renderIncs();
   ['needs','wants','savings'].forEach(renderBLCat);
   renderBudgetCharts();
+  renderProgressPro();
 }
 
 function renderStats(){
@@ -2056,7 +2199,7 @@ function setBL(id,f,v){
   else if(f==='goalId')bl[f]=v?parseInt(v):null;
   else if(f==='paid')bl[f]=v;
   else bl[f]=parseFloat(v)||0;
-  saveS();renderBLFoot(bl.cat);renderCatTot(bl.cat);renderStats();renderBudgetCharts();
+  saveS();renderBLFoot(bl.cat);renderCatTot(bl.cat);renderStats();renderBudgetCharts();renderProgressPro();
 }
 function togBLPaid(id){const m=curM();if(!m)return;const bl=m.budgetLines.find(x=>x.id===id);if(!bl)return;bl.paid=!bl.paid;saveS();const tr=document.getElementById('bl-'+id);if(tr)applyBLCls(tr,bl);}
 function applyBLCls(tr,bl){const actual=lineActual(bl.id);const over=actual>(bl.planned||0)&&(bl.planned||0)>0;tr.className=over&&!bl.paid?'row-over':'';}
@@ -3766,6 +3909,249 @@ function renderDividir(){
   </div>`;
 }
 
+// ═══════════════════ DARK MODE ═══════════════════
+function toggleDark(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const next=isDark?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('pp_theme',next);
+  const btn=document.getElementById('darkBtn');
+  if(btn)btn.textContent=next==='dark'?'☀️':'🌙';
+}
+function initTheme(){
+  const t=localStorage.getItem('pp_theme')||'light';
+  document.documentElement.setAttribute('data-theme',t);
+  const btn=document.getElementById('darkBtn');
+  if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+}
+
+// ═══════════════════ COMPARACIÓN MES A MES ═══════════════════
+function renderMonthComparison(){
+  const keys=sortedMonthKeys().slice(-8);
+  if(keys.length<2){
+    // Solo 1 mes: mostrar placeholder
+    const el=document.getElementById('cMonthComp');
+    if(el){el.getContext('2d').clearRect(0,0,el.width,el.height);}
+    return;
+  }
+  const labels=keys.map(k=>{
+    const m=S.months[k];
+    const parts=(m?.label||k).split(' ');
+    return (parts[0]||'').substring(0,3)+' '+(parts.pop()||'').substring(2);
+  });
+  const needs=keys.map(k=>{const c=compute(k);return c?Math.round(c.exp.needs.actual):0;});
+  const wants=keys.map(k=>{const c=compute(k);return c?Math.round(c.exp.wants.actual):0;});
+  const savings=keys.map(k=>{const c=compute(k);return c?Math.round(c.exp.savings.actual):0;});
+  mkCh('comp','cMonthComp',{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'🏠 Necesidades',data:needs,backgroundColor:'rgba(66,153,225,.8)',borderRadius:3,stack:'g'},
+      {label:'🎉 Discrecional',data:wants,backgroundColor:'rgba(237,137,54,.8)',borderRadius:3,stack:'g'},
+      {label:'💎 Ahorro/Inv.',data:savings,backgroundColor:'rgba(72,187,120,.8)',borderRadius:3,stack:'g'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}},
+        tooltip:{callbacks:{
+          footer:items=>{
+            const i=items[0]?.dataIndex;
+            if(i==null)return'';
+            const tot=needs[i]+wants[i]+savings[i];
+            return`Total: ${fmt(tot)}`;
+          }
+        }}
+      },
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:11}}},
+        y:{stacked:true,ticks:{callback:v=>{const s=fmt(v);return s.length>9?s.replace(/[.,]\d{2}$/,''):s;}},grid:{color:'#edf2f7'}}
+      }
+    }
+  });
+}
+
+// ═══════════════════ PRO PROGRESS BARS ═══════════════════
+function renderProgressPro(){
+  const m=curM();if(!m)return;
+  const wrap=document.getElementById('progProWrap');if(!wrap)return;
+  const cats=[
+    {key:'needs',label:'🏠 Necesidades',color:'#4299e1'},
+    {key:'wants',label:'🎉 Discrecional',color:'#ed8936'},
+    {key:'savings',label:'💎 Ahorro / Inversiones',color:'#48bb78'},
+  ];
+  let html='';
+  cats.forEach(({key,label,color})=>{
+    const lines=m.budgetLines.filter(b=>b.cat===key);
+    if(!lines.length)return;
+    const catActuals=lines.map(bl=>({bl,actual:lineActual(bl.id)}));
+    html+=`<div class="prog-pro-cat">
+      <div class="prog-pro-cat-label">${label}</div>
+      ${catActuals.map(({bl,actual})=>{
+        const planned=bl.planned||0;
+        const pct=planned>0?Math.round(actual/planned*100):actual>0?100:0;
+        const barW=Math.min(100,pct);
+        const barColor=pct>110?'var(--r)':pct>90?'var(--o)':color;
+        const pctColor=pct>110?'var(--r)':pct>90?'var(--o)':pct>0?'var(--g)':'var(--muted)';
+        return`<div class="prog-pro-card">
+          <div class="prog-pro-header">
+            <span class="prog-pro-name">${esc(bl.description||'Sin descripción')}</span>
+            <span class="prog-pro-pct" style="color:${pctColor}">${planned>0?pct+'%':actual>0?fmt(actual):'Sin plan'}</span>
+          </div>
+          <div class="prog-pro-bar"><div class="prog-pro-fill" style="width:${barW}%;background:${barColor}"></div></div>
+          <div class="prog-pro-amounts">
+            <span>Real: <strong style="color:${barColor}">${fmt(actual)}</strong></span>
+            <span>${planned>0?`Plan: ${fmt(planned)}`:'Sin presupuesto'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  wrap.innerHTML=html||'<p style="color:var(--muted);font-size:.82rem;padding:8px 0">No hay líneas con presupuesto. Completá el presupuesto primero.</p>';
+}
+
+// ═══════════════════ FACTURACIÓN ═══════════════════
+let _factFilter='todas';
+
+function setFactFilter(f){
+  _factFilter=f;
+  document.querySelectorAll('#factFilterPill button').forEach(b=>b.classList.remove('active'));
+  const idx=['todas','pendiente','cobrada','vencida'].indexOf(f);
+  const btns=document.querySelectorAll('#factFilterPill button');
+  if(btns[idx])btns[idx].classList.add('active');
+  renderFacturas();
+}
+
+function getFactStatus(f){
+  if(f.estado==='cobrada')return'cobrada';
+  if(f.estado==='anulada')return'anulada';
+  const today=new Date().toISOString().split('T')[0];
+  if(f.vencimiento&&f.vencimiento<today)return'vencida';
+  return'pendiente';
+}
+
+function addFactura(){
+  const concepto=(document.getElementById('fConcepto').value||'').trim();
+  const monto=parseFloat(document.getElementById('fMonto').value)||0;
+  const moneda=document.getElementById('fMoneda').value||'ARS';
+  const fecha=document.getElementById('fFecha').value;
+  const venc=document.getElementById('fVenc').value;
+  const numero=(document.getElementById('fNumero').value||'').trim();
+  if(!concepto||!monto||!fecha){alert('Completá al menos concepto, monto y fecha de emisión');return;}
+  if(!S.facturas)S.facturas=[];
+  S.facturas.unshift({id:uid(),numero,concepto,monto,moneda,fecha,vencimiento:venc,estado:'pendiente',cobradaEn:null});
+  document.getElementById('fConcepto').value='';
+  document.getElementById('fMonto').value='';
+  document.getElementById('fNumero').value='';
+  saveS();renderFacturas();
+}
+
+function cobrarFactura(id){
+  if(!S.facturas)return;
+  const f=S.facturas.find(x=>x.id===id);if(!f)return;
+  f.estado='cobrada';
+  f.cobradaEn=new Date().toISOString().split('T')[0];
+  // Auto-feed income entry en el mes actual
+  const m=curM();
+  if(m){
+    const rate=getCurrentUSDRate()||1;
+    const amtARS=f.moneda==='USD'?Math.round(f.monto*rate):f.monto;
+    S.dailyEntries.push({
+      id:uid(),date:f.cobradaEn,monthKey:S.currentMonth,
+      description:`🧾 ${f.concepto}${f.numero?' #'+f.numero:''}`,
+      amount:amtARS,cat:'income',budgetLineId:null,
+      usdRateAtTime:f.moneda==='USD'?rate:null,
+      _fromFactura:true
+    });
+  }
+  saveS();renderFacturas();
+  if(document.getElementById('pane-daily').classList.contains('active'))renderDaily();
+  if(document.getElementById('pane-dash').classList.contains('active'))renderDash();
+}
+
+function anularFactura(id){
+  if(!S.facturas)return;
+  const f=S.facturas.find(x=>x.id===id);if(!f)return;
+  if(!confirm(`¿Anular factura "${f.concepto}"? No se puede deshacer.`))return;
+  f.estado='anulada';
+  saveS();renderFacturas();
+}
+
+function delFactura(id){
+  if(!S.facturas)return;
+  const f=S.facturas.find(x=>x.id===id);if(!f)return;
+  if(!confirm(`¿Eliminar la factura "${f.concepto}"?`))return;
+  S.facturas=S.facturas.filter(x=>x.id!==id);
+  saveS();renderFacturas();
+}
+
+function renderFacturas(){
+  if(!S.facturas)S.facturas=[];
+  const all=S.facturas;
+  const today=new Date().toISOString().split('T')[0];
+  const rate=getCurrentUSDRate()||1;
+
+  // KPIs
+  const withStatus=all.map(f=>({...f,_st:getFactStatus(f)}));
+  const pend=withStatus.filter(f=>f._st==='pendiente');
+  const venc=withStatus.filter(f=>f._st==='vencida');
+  const cob=withStatus.filter(f=>f._st==='cobrada');
+  const toARS=f=>f.moneda==='USD'?f.monto*rate:f.monto;
+  const sumARS=arr=>arr.reduce((s,f)=>s+toARS(f),0);
+  document.getElementById('factKpiRow').innerHTML=[
+    {lbl:'⏳ Pendientes de cobro',val:pend.length,sub:fmt(sumARS(pend)),cls:'o',ico:'📋'},
+    {lbl:'🔴 Vencidas sin cobrar',val:venc.length,sub:venc.length?fmt(sumARS(venc)):'✓ Sin vencidas',cls:venc.length?'r':'g',ico:'🚨'},
+    {lbl:'✅ Cobradas',val:cob.length,sub:fmt(sumARS(cob)),cls:'g',ico:'💰'},
+    {lbl:'🧾 Total emitidas',val:all.filter(f=>f.estado!=='anulada').length,sub:fmt(sumARS(pend)+sumARS(venc)+sumARS(cob)),cls:'',ico:'📑'},
+  ].map(k=>`<div class="kpi ${k.cls}">
+    <div class="kpi-ico">${k.ico}</div>
+    <div class="kpi-lbl">${k.lbl}</div>
+    <div class="kpi-val">${k.val}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+  // Filter + sort
+  let list=withStatus;
+  if(_factFilter!=='todas')list=list.filter(f=>f._st===_factFilter);
+  list=[...list].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const countEl=document.getElementById('factCount');
+  if(countEl)countEl.textContent=list.length+' factura'+(list.length!==1?'s':'');
+
+  const wrap=document.getElementById('factList');if(!wrap)return;
+  if(!list.length){
+    wrap.innerHTML=`<div class="card" style="text-align:center;padding:32px 16px;color:var(--muted)">
+      <div style="font-size:2rem;margin-bottom:8px">🧾</div>
+      <div style="font-weight:700">${_factFilter==='todas'?'Sin facturas. Cargá la primera arriba.':'Sin facturas en este estado.'}</div>
+    </div>`;return;
+  }
+  const stLabels={pendiente:'⏳ Pendiente',cobrada:'✅ Cobrada',vencida:'🔴 Vencida',anulada:'❌ Anulada'};
+  wrap.innerHTML=list.map(f=>{
+    const st=f._st;
+    const montoFmt=f.moneda==='USD'
+      ?`<strong>USD ${f.monto.toLocaleString('en-US',{minimumFractionDigits:2})}</strong> <span style="font-size:.7rem;color:var(--muted)">≈ ${fmt(toARS(f))}</span>`
+      :`<strong>${fmt(f.monto)}</strong>`;
+    return`<div class="factura-card ${st}">
+      <div class="factura-top">
+        <div>
+          <div class="factura-concepto">${esc(f.concepto)}</div>
+          ${f.numero?`<div style="font-size:.7rem;color:var(--muted);margin-top:1px">N° ${esc(f.numero)}</div>`:''}
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="factura-monto">${montoFmt}</div>
+          <span class="factura-status ${st}">${stLabels[st]||st}</span>
+        </div>
+      </div>
+      <div class="factura-meta">
+        📅 Emitida: <strong>${f.fecha}</strong>
+        ${f.vencimiento?` &nbsp;·&nbsp; Vence: <strong style="color:${st==='vencida'?'var(--r)':'inherit'}">${f.vencimiento}</strong>`:''}
+        ${f.cobradaEn?` &nbsp;·&nbsp; Cobrada: <strong>${f.cobradaEn}</strong>`:''}
+      </div>
+      <div class="factura-actions">
+        ${(st==='pendiente'||st==='vencida')?`<button class="btn btn-g" onclick="cobrarFactura(${f.id})" style="font-size:.75rem;padding:5px 12px">✅ Marcar cobrada</button>`:''}
+        ${(st==='pendiente'||st==='vencida')?`<button class="btn" onclick="anularFactura(${f.id})" style="background:#e2e8f0;color:var(--text);font-size:.75rem;padding:5px 10px">❌ Anular</button>`:''}
+        <button class="btn btn-del" onclick="delFactura(${f.id})">🗑 Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ═══════════════════════════ INIT ═══════════════════════════
 // loadS es async ahora (intenta API antes de localStorage)
 S=mkDemoState(); // placeholder mientras carga
@@ -3781,6 +4167,7 @@ async function initApp(){
   const todayMonth=today.substring(0,7);
   document.getElementById('eDate').value=today;
   document.getElementById('txDate').value=today;
+  const fFechaEl=document.getElementById('fFecha');if(fFechaEl)fFechaEl.value=today;
   const cStart=document.getElementById('cStart');
   if(cStart)cStart.value=S.currentMonth;
 
@@ -3802,6 +4189,8 @@ async function initApp(){
     saveS();
   }
 
+  if(!S.facturas)S.facturas=[];
+  initTheme();
   updateMonthBar();
   updateNavRates();
   renderDash();
@@ -3811,6 +4200,7 @@ async function initApp(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  initTheme();
   // Close more panel when tapping backdrop
   document.addEventListener('click',(e)=>{
     const panel=document.getElementById('mobMorePanel');
