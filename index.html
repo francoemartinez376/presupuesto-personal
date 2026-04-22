@@ -1239,19 +1239,26 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     </label>
     <div id="splitSection" style="display:none">
       <div class="split-section">
-        <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px">¿QUIÉNES PARTICIPAN?</div>
-        <!-- Chips de personas -->
-        <div id="splitChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px"></div>
-        <!-- Input para agregar -->
-        <div style="display:flex;gap:6px">
+        <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">¿QUIÉNES PARTICIPAN?</div>
+        <!-- Contactos guardados (quick-select) -->
+        <div id="splitSavedContacts" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
+        <!-- Chips de personas seleccionadas -->
+        <div id="splitChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <!-- Input para agregar nuevo -->
+        <div style="display:flex;gap:6px;margin-bottom:12px">
           <input type="text" id="splitNewName"
-            placeholder="Nombre (Enter para agregar)…"
+            placeholder="Nuevo nombre…"
             style="flex:1;padding:7px 11px;border:1.5px solid var(--bdr);border-radius:8px;font-size:.86rem"
             onkeydown="if(event.key==='Enter'){addSplitPerson();event.preventDefault()}"
             oninput="renderSplitPreview()">
-          <button class="btn btn-g" onclick="addSplitPerson()" style="padding:7px 14px;font-size:.82rem">＋ Agregar</button>
+          <button class="btn btn-g" onclick="addSplitPerson()" style="padding:7px 14px;font-size:.82rem">＋</button>
         </div>
-        <div id="splitPreview" style="margin-top:10px"></div>
+        <!-- Quién pagó (solo si hay personas) -->
+        <div id="splitPayerRow" style="display:none;margin-bottom:10px">
+          <div style="font-size:.67rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">¿QUIÉN PAGÓ EL TOTAL?</div>
+          <div id="splitPayerBtns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+        <div id="splitPreview" style="margin-top:4px"></div>
       </div>
     </div>
   </div>
@@ -2952,41 +2959,99 @@ function filterEntryLines(){
 
 // ═══════════════ SPLIT EN FORM DE GASTOS ═══════════════
 let _splitPeople=['Yo']; // siempre empieza con "Yo"
+let _splitPayer='Yo';   // quién pagó el total ('Yo' u otro nombre)
 
 function toggleSplitSection(){
   const on=document.getElementById('eSplitToggle').checked;
   document.getElementById('splitSection').style.display=on?'block':'none';
-  if(on){_splitPeople=['Yo'];renderSplitChips();renderSplitPreview();}
+  if(on){
+    _splitPeople=['Yo'];
+    _splitPayer='Yo';
+    renderSplitSaved();
+    renderSplitChips();
+    renderSplitPayer();
+    renderSplitPreview();
+  }
+}
+
+function renderSplitSaved(){
+  // Muestra contactos guardados como chips para agregar rápido
+  const el=document.getElementById('splitSavedContacts');if(!el)return;
+  const saved=(S.contacts||[]).filter(c=>!_splitPeople.includes(c));
+  el.innerHTML=saved.length
+    ?saved.map(c=>`<span class="contact-chip" style="font-size:.72rem;padding:4px 10px" onclick="splitAddSaved('${c.replace(/'/g,"\\'")}')">+ ${c}</span>`).join('')
+    :'';
+}
+
+function splitAddSaved(name){
+  if(!_splitPeople.includes(name)) _splitPeople.push(name);
+  renderSplitSaved();
+  renderSplitChips();
+  renderSplitPayer();
+  renderSplitPreview();
 }
 
 function renderSplitChips(){
   const container=document.getElementById('splitChips');if(!container)return;
   container.innerHTML=_splitPeople.map((p,i)=>{
-    const isMe=i===0;
-    return `<div style="display:inline-flex;align-items:center;gap:5px;background:${isMe?'#ebf4ff':'#f0f4ff'};border:1.5px solid ${isMe?'#90cdf4':'#bee3f8'};border-radius:20px;padding:5px 12px;font-size:.82rem;font-weight:700;color:${isMe?'var(--pri)':'#4a5568'}">
-      ${isMe?'👤 ':''}${p}
-      ${isMe
-        ?''
-        :`<button onclick="splitRemove(${i})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:.9rem;line-height:1;padding:0 0 0 2px" title="Quitar">✕</button>`
-      }
+    const isMe=p==='Yo';
+    const isPayer=p===_splitPayer;
+    return `<div style="display:inline-flex;align-items:center;gap:5px;background:${isMe?'#ebf4ff':isPayer?'#f0fff4':'#f0f4ff'};border:1.5px solid ${isMe?'#90cdf4':isPayer?'#9ae6b4':'#bee3f8'};border-radius:20px;padding:5px 12px;font-size:.82rem;font-weight:700;color:${isMe?'var(--pri)':isPayer?'#276749':'#4a5568'}">
+      ${isMe?'👤 ':isPayer?'💳 ':''}${p}
+      ${!isMe?`<button onclick="splitRemove(${i})" style="background:none;border:none;cursor:pointer;color:#a0aec0;font-size:.9rem;line-height:1;padding:0 0 0 2px">✕</button>`:''}
     </div>`;
   }).join('');
 }
 
+function renderSplitPayer(){
+  const row=document.getElementById('splitPayerRow');
+  const btns=document.getElementById('splitPayerBtns');
+  if(!row||!btns)return;
+  if(_splitPeople.length<2){row.style.display='none';return;}
+  row.style.display='block';
+  btns.innerHTML=_splitPeople.map(p=>{
+    const active=p===_splitPayer;
+    return`<button onclick="setSplitPayer('${p.replace(/'/g,"\\'")}');event.preventDefault()"
+      style="padding:7px 14px;border-radius:20px;border:1.5px solid ${active?'#276749':'var(--bdr)'};
+      background:${active?'#276749':'transparent'};color:${active?'#fff':'var(--text)'};
+      font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s">
+      ${p==='Yo'?'👤':'💳'} ${p}${active?' ✓':''}
+    </button>`;
+  }).join('');
+}
+
+function setSplitPayer(name){
+  _splitPayer=name;
+  renderSplitChips();
+  renderSplitPayer();
+  renderSplitPreview();
+}
+
 function splitRemove(i){
+  const removed=_splitPeople[i];
   _splitPeople.splice(i,1);
-  renderSplitChips();renderSplitPreview();
+  if(_splitPayer===removed) _splitPayer='Yo';
+  renderSplitSaved();
+  renderSplitChips();
+  renderSplitPayer();
+  renderSplitPreview();
 }
 
 function addSplitPerson(){
   const inp=document.getElementById('splitNewName');
   const raw=inp.value.trim();
   if(!raw)return;
-  // permite varios separados por coma: "Nico, Damian, Lau"
   const names=raw.split(',').map(n=>n.trim()).filter(n=>n&&!_splitPeople.includes(n));
   _splitPeople.push(...names);
+  // Guardar en contactos persistentes
+  if(!S.contacts)S.contacts=[];
+  names.forEach(n=>{if(!S.contacts.includes(n))S.contacts.push(n);});
+  saveS();
   inp.value='';
-  renderSplitChips();renderSplitPreview();
+  renderSplitSaved();
+  renderSplitChips();
+  renderSplitPayer();
+  renderSplitPreview();
   inp.focus();
 }
 
@@ -2995,14 +3060,26 @@ function renderSplitPreview(){
   const total=parseFloat(document.getElementById('eAmt')?document.getElementById('eAmt').value:0)||0;
   const people=_splitPeople.filter(p=>p.trim());
   if(people.length<2||!total){prev.innerHTML='';return;}
-  const perHead=total/people.length;
-  const others=people.slice(1);
-  prev.innerHTML=`<div class="split-preview">
-    <div class="sp-lbl">Cómo queda dividido (${people.length} personas)</div>
-    <div class="sp-mine">💰 Tu parte: <strong>${fmt(perHead)}</strong></div>
-    ${others.length?`<div class="sp-debt" style="margin-top:6px">📲 Te deben: ${others.map(p=>`<span>${p}: ${fmt(perHead)}</span>`).join('')}</div>`:''}
-    <div style="font-size:.7rem;color:var(--muted);margin-top:6px">Se registra solo tu parte (${fmt(perHead)}) · Total del gasto: ${fmt(total)}</div>
-  </div>`;
+  const perHead=Math.round(total/people.length);
+  const iPayAll=_splitPayer==='Yo';
+  const payerName=_splitPayer;
+  const others=people.filter(p=>p!==payerName);
+  const myShare=perHead; // siempre mi parte es 1/N
+
+  let html='<div class="split-preview">';
+  html+=`<div class="sp-lbl">División entre ${people.length} personas — ${fmt(perHead)} c/u</div>`;
+
+  if(iPayAll){
+    html+=`<div class="sp-mine">💳 Vos pagás el total (${fmt(total)}), tu parte real: <strong>${fmt(myShare)}</strong></div>`;
+    html+=`<div class="sp-debt" style="margin-top:6px">📲 Te deben: ${others.map(p=>`<strong>${p}: ${fmt(perHead)}</strong>`).join(' · ')}</div>`;
+    html+=`<div style="font-size:.7rem;color:var(--muted);margin-top:5px">→ Se registra el total (${fmt(total)}) como gasto tuyo y se crean las deudas automáticamente</div>`;
+  } else {
+    html+=`<div class="sp-mine" style="color:#c05621">💳 <strong>${payerName}</strong> pagó el total (${fmt(total)})</div>`;
+    html+=`<div class="sp-debt" style="margin-top:6px;color:#276749">📲 Tu parte: <strong>${fmt(myShare)}</strong> — se crea deuda: Le debés a ${payerName}</div>`;
+    html+=`<div style="font-size:.7rem;color:var(--muted);margin-top:5px">→ Se registra solo tu parte (${fmt(myShare)}) como gasto y se crea la deuda automáticamente</div>`;
+  }
+  html+='</div>';
+  prev.innerHTML=html;
 }
 
 let _entryType = 'gasto'; // 'gasto' | 'ingreso'
@@ -3018,6 +3095,7 @@ function setEntryType(type){
   document.getElementById('eIngresoFields').style.display = !isGasto ? 'block' : 'none';
   document.getElementById('splitSection').style.display = 'none';
   document.getElementById('eSplitToggle').checked = false;
+  _splitPeople=['Yo'];_splitPayer='Yo';
   // Populate income lines selector
   if(!isGasto) refreshIncLineSelect();
 }
@@ -3057,12 +3135,46 @@ function addEntry(){
     const currentRate=getCurrentUSDRate();
     const isSplit=document.getElementById('eSplitToggle').checked;
     const people=isSplit?_splitPeople.filter(p=>p.trim()):null;
-    const myAmt=isSplit&&people&&people.length>1?totalAmt/people.length:totalAmt;
     const entryDesc=desc||document.getElementById('eLine').options[document.getElementById('eLine').selectedIndex]?.text||cat;
-    const entry={id:uid(),date,monthKey:mk,cat,description:entryDesc,amount:myAmt,budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate};
-    if(isSplit&&people&&people.length>1){ entry.split={total:totalAmt,people,myShare:myAmt}; }
-    S.dailyEntries.push(entry);
-    if(isSplit){ document.getElementById('eSplitToggle').checked=false; document.getElementById('splitSection').style.display='none'; _splitPeople=['Yo']; }
+
+    if(isSplit&&people&&people.length>1){
+      const n=people.length;
+      const perHead=Math.round(totalAmt/n);
+      const iPayAll=_splitPayer==='Yo';
+      if(!S.deudas)S.deudas=[];
+      const today=date||new Date().toISOString().split('T')[0];
+
+      if(iPayAll){
+        // Yo pagué el total → registrar gasto completo + deuda ME_DEBEN por cada uno
+        const entry={id:uid(),date,monthKey:mk,cat,description:entryDesc,amount:totalAmt,
+          budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate,
+          _split:{total:totalAmt,people,payer:'Yo',perHead}};
+        S.dailyEntries.push(entry);
+        people.filter(p=>p!=='Yo').forEach(p=>{
+          S.deudas.unshift({id:uid(),nombre:p,tipo:'me_deben',
+            montoOriginal:perHead,moneda:'ARS',
+            descripcion:`Compartieron: ${entryDesc}`,
+            fecha:today,estado:'pendiente',pagos:[]});
+        });
+      } else {
+        // Otro pagó → registrar solo mi parte + deuda LES_DEBO a quien pagó
+        const entry={id:uid(),date,monthKey:mk,cat,description:entryDesc,amount:perHead,
+          budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate,
+          _split:{total:totalAmt,people,payer:_splitPayer,perHead}};
+        S.dailyEntries.push(entry);
+        S.deudas.unshift({id:uid(),nombre:_splitPayer,tipo:'les_debo',
+          montoOriginal:perHead,moneda:'ARS',
+          descripcion:`${_splitPayer} pagó: ${entryDesc}`,
+          fecha:today,estado:'pendiente',pagos:[]});
+      }
+      document.getElementById('eSplitToggle').checked=false;
+      document.getElementById('splitSection').style.display='none';
+      _splitPeople=['Yo'];_splitPayer='Yo';
+    } else {
+      const entry={id:uid(),date,monthKey:mk,cat,description:entryDesc,amount:totalAmt,
+        budgetLineId:lineId?parseInt(lineId):null,usdRateAtTime:currentRate};
+      S.dailyEntries.push(entry);
+    }
   }
 
   // Track unknown descriptions for learning recommendations
