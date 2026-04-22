@@ -539,7 +539,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   .ai-modal{padding:16px 12px;border-radius:12px}
   .ai-overlay{padding:6px 4px;align-items:flex-start}
   /* Hide table on mobile, show cards instead */
-  #aiResults div[style*="overflow-x"]{display:none!important}
+  #aiTableWrap{display:none!important}
   /* Make the modal full-screen on mobile */
   .ai-modal{max-width:100%;width:100%;border-radius:12px 12px 0 0;min-height:50vh}
   .ai-overlay{align-items:flex-end;padding:0}
@@ -608,7 +608,131 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 
   /* ── Bottom padding for floating button areas ── */
   #pane-daily .add-entry-form{position:sticky;top:95px;z-index:80;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
+  /* ══════════════════════════════════════════
+     NUCLEAR MOBILE OVERRIDE — ninguna sección
+     puede desbordar horizontalmente
+  ══════════════════════════════════════════ */
+
+  /* Cero overflow horizontal en TODA la app */
+  body,html{overflow-x:hidden!important;max-width:100vw!important}
+  .main,.pane,.card,.add-form,.add-entry-form,
+  .cuota-form,.settings-modal,.ai-modal{
+    max-width:100%!important;box-sizing:border-box!important;overflow-x:hidden!important
+  }
+
+  /* Todos los inputs y selects: 100% de ancho, nunca overflow */
+  input,select,textarea{
+    max-width:100%!important;box-sizing:border-box!important;
+  }
+  /* Sobrescribir anchos fijos inline (ej: width:160px, width:110px) */
+  input[style*="width"],select[style*="width"]{
+    width:100%!important;min-width:0!important;box-sizing:border-box!important
+  }
+
+  /* Todos los .field: columna full-width */
+  .field{width:100%!important;min-width:0!important;flex:1 1 100%!important}
+  .field input,.field select{width:100%!important;box-sizing:border-box!important}
+
+  /* .row (flex wrap) → columna en mobile */
+  .row{flex-direction:column!important;gap:8px!important}
+  .row .field{flex:1 1 100%!important}
+
+  /* Grids inline de 4/5/6 columnas → 2 columnas */
+  #usdKpiRow{grid-template-columns:1fr 1fr!important}
+  #deudaFormGrid{grid-template-columns:1fr 1fr!important}
+  #deudaFormGrid button{grid-column:1/-1!important;width:100%!important}
+  #deudaFormGrid .field:nth-child(5),
+  #deudaFormGrid .field:nth-child(6){grid-column:1/-1!important}
+
+  /* Facturación */
+  .fact-form-grid{grid-template-columns:1fr 1fr!important}
+  .fact-form-grid button{grid-column:1/-1!important;width:100%!important}
+  .fact-kpi-row{grid-template-columns:1fr 1fr!important}
+
+  /* Ahorro */
+  .afg{grid-template-columns:1fr 1fr!important}
+  .afg button{grid-column:1/-1!important;width:100%!important}
+  .txg{grid-template-columns:1fr 1fr!important}
+  .txg button{grid-column:1/-1!important;width:100%!important}
+
+  /* Cuotas */
+  .cuota-form-grid{grid-template-columns:1fr 1fr!important}
+  .cuota-form-grid button{grid-column:1/-1!important;width:100%!important}
+
+  /* Deudas KPI */
+  .deuda-kpi-row{grid-template-columns:1fr 1fr!important}
+
+  /* Dividir — form inline */
+  #pane-dividir .row{flex-direction:column!important}
+  #divExpDesc,#divExpAmt,#divExpPaidBy{width:100%!important;min-width:0!important;box-sizing:border-box!important}
+
+  /* Tablas: permitir scroll interno pero cortar el borde del card */
+  .tw{overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+  .tw table{min-width:0!important;font-size:.75rem!important}
+  /* Savings transactions table */
+  #pane-savings .tw{overflow-x:auto}
+
+  /* USD Table */
+  #usdTable{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #usdTable table{font-size:.72rem!important}
+
+  /* ds-item nunca desborda */
+  .ds-item{min-width:0!important;flex:1 1 0!important}
+  .daily-summary{flex-wrap:wrap!important}
+
+  /* Toggle pill — wrap en mobile */
+  .toggle-pill{flex-wrap:wrap!important;gap:4px!important}
+  .toggle-pill button{font-size:.7rem!important;padding:5px 8px!important}
+
+  /* Fact/deuda filter pills */
+  #factFilterPill,#deudaFilterPill{display:flex;flex-wrap:wrap;gap:4px}
+
+  /* Factura cards */
+  .factura-actions{flex-wrap:wrap!important;gap:4px!important}
+  .factura-actions .btn{font-size:.7rem!important;padding:5px 9px!important}
+
+  /* Deuda actions */
+  .deuda-actions{flex-wrap:wrap!important}
+
+  /* Cuota cards */
+  .cuota-card{overflow:hidden}
+  .cuota-months{flex-wrap:wrap!important}
+
+  /* Entry rows */
+  .entry-row{flex-wrap:nowrap!important}
+
+  /* Modal de pago parcial — asegurar que entre en mobile */
+  #pagoModal > div{margin:8px!important;padding:18px 14px!important}
+
+  /* Hoy grid */
+  .hoy-grid{grid-template-columns:1fr 1fr!important}
+
+  /* Settings rows */
+  .settings-row{flex-direction:column!important}
+  .settings-row .field{min-width:0!important;width:100%!important}
+  .settings-section{padding:12px!important}
+
+  /* AI modal full-screen */
+  .ai-overlay{padding:0!important;align-items:flex-end!important}
+  .ai-modal{border-radius:16px 16px 0 0!important;max-height:90vh;overflow-y:auto}
+  #aiTableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 }
+
+/* ── Mobile budget line card ── */
+.mob-bl-card{background:var(--card);border-radius:10px;padding:11px 13px;margin-bottom:8px;border:1px solid var(--bdr);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.mob-bl-card-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.mob-bl-card-desc{flex:1;min-width:0}
+.mob-bl-card-desc input{width:100%;border:1.5px solid var(--bdr);border-radius:7px;padding:8px 10px;font-size:15px;font-family:inherit;background:var(--card);color:var(--text)}
+.mob-bl-card-nums{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.mob-bl-card-num{display:flex;flex-direction:column;gap:2px;flex:1;min-width:90px}
+.mob-bl-card-num label{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.mob-bl-card-num input{border:1.5px solid var(--bdr);border-radius:7px;padding:7px 9px;font-size:15px;font-family:inherit;background:var(--card);color:var(--text);width:100%}
+.mob-bl-card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px}
+.mob-bl-foot-sum{font-size:.72rem;font-weight:700;color:var(--muted);border-top:1px solid var(--bdr);padding-top:8px;margin-top:4px}
+/* Deuda card expanded actions */
+.deuda-more-actions{display:none;margin-top:8px;gap:6px;flex-wrap:wrap}
+.deuda-more-actions.open{display:flex}
 
 /* ══════════════════ DARK MODE ══════════════════ */
 [data-theme="dark"]{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--bdr:#334155;--pri:#60a5fa;--pri2:#3b82f6}
@@ -1336,9 +1460,9 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
     <div style="margin-bottom:16px;background:#f7fafc;border-radius:10px;padding:14px;border:1px solid var(--bdr)">
       <div class="ct" style="font-size:.75rem;margin-bottom:10px">💸 Nuevo gasto</div>
       <div class="row" style="gap:10px">
-        <div class="field"><label>Descripción</label><input type="text" id="divExpDesc" placeholder="Ej: Padel, Cena, Nafta…" style="width:160px"></div>
-        <div class="field"><label>Monto total</label><input type="number" id="divExpAmt" placeholder="0" min="0" style="width:110px" oninput="divPreviewParts()"></div>
-        <div class="field"><label>¿Quién pagó?</label><select id="divExpPaidBy" style="width:130px"></select></div>
+        <div class="field"><label>Descripción</label><input type="text" id="divExpDesc" placeholder="Ej: Padel, Cena, Nafta…"></div>
+        <div class="field"><label>Monto total</label><input type="number" id="divExpAmt" placeholder="0" min="0" oninput="divPreviewParts()"></div>
+        <div class="field"><label>¿Quién pagó?</label><select id="divExpPaidBy"></select></div>
         <div class="field"><label>¿Quién participó?</label>
           <div id="divExpParticipants" style="display:flex;flex-wrap:wrap;gap:4px;padding:4px 0"></div>
         </div>
@@ -1521,7 +1645,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
         <div style="font-size:.88rem;font-weight:700;color:var(--pri)">✅ Gastos detectados — revisá y editá antes de confirmar</div>
         <button class="btn btn-add" onclick="addAIRow()" style="width:auto;padding:5px 12px;font-size:.75rem;margin:0">＋ Agregar fila</button>
       </div>
-      <div style="overflow-x:auto">
+      <div id="aiTableWrap" style="overflow-x:auto">
         <table class="ai-preview-tbl">
           <thead>
             <tr>
@@ -2335,6 +2459,46 @@ function renderIncs(){
     </tr>`;
   }).join('');
   renderIncFoot();
+  if(isMobile()){
+    const incBody=document.getElementById('incBody');
+    const tw=incBody?incBody.closest('.tw'):null;
+    if(tw){
+      tw.style.display='none';
+      // Remove previously injected cards
+      let prev=tw.nextElementSibling;
+      if(prev&&prev.classList.contains('mob-inc-cards'))prev.remove();
+      const cardsDiv=document.createElement('div');
+      cardsDiv.className='mob-inc-cards';
+      cardsDiv.innerHTML=m.incomes.map(i=>{
+        const diffVal=(i.actual||0)-(i.planned||0);
+        const over=diffVal<0&&(i.planned||0)>0;
+        const diffColor=over?'var(--r)':'var(--g)';
+        const diffSign=diffVal>0?'+':'';
+        return`<div class="mob-bl-card">
+          <div class="mob-bl-card-top">
+            <div class="mob-bl-card-desc">
+              <input type="text" value="${esc(i.description)}" placeholder="Ej: Sueldo…" oninput="setInc(${i.id},'description',this.value)">
+            </div>
+            <button class="btn btn-del" style="flex-shrink:0" onclick="delInc(${i.id})">✕</button>
+          </div>
+          <div class="mob-bl-card-nums">
+            <div class="mob-bl-card-num">
+              <label>Planificado</label>
+              <input type="number" value="${i.planned||''}" placeholder="0" oninput="setInc(${i.id},'planned',this.value)">
+            </div>
+            <div class="mob-bl-card-num">
+              <label>Real</label>
+              <input type="number" value="${i.actual||''}" placeholder="0" oninput="setInc(${i.id},'actual',this.value)">
+            </div>
+          </div>
+          <div class="mob-bl-card-foot">
+            <span style="font-size:.72rem;font-weight:700;color:${diffColor}">${diffSign}${fmt(Math.abs(diffVal))}</span>
+          </div>
+        </div>`;
+      }).join('');
+      tw.parentNode.insertBefore(cardsDiv,tw.nextSibling);
+    }
+  }
 }
 function renderIncFoot(){
   const m=curM();if(!m)return;
@@ -2387,6 +2551,54 @@ function renderBLCat(cat){
   const key=cat==='needs'?'N':cat==='wants'?'W':'S';
   document.getElementById('exp'+key).innerHTML=rows.map(blRow).join('');
   renderBLFoot(cat);renderCatTot(cat);
+  if(isMobile()){
+    // Find the .tw wrapper for this cat and inject mobile cards after it
+    const tbody=document.getElementById('exp'+key);
+    const tw=tbody?tbody.closest('.tw'):null;
+    if(tw){
+      tw.style.display='none';
+      // Remove any previously injected mob-bl-cards for this cat
+      let prev=tw.nextElementSibling;
+      if(prev&&prev.classList.contains('mob-bl-cards')&&prev.dataset.cat===cat)prev.remove();
+      // Build cards
+      const cardsDiv=document.createElement('div');
+      cardsDiv.className='mob-bl-cards';
+      cardsDiv.dataset.cat=cat;
+      cardsDiv.innerHTML=rows.map(bl=>{
+        const actual=lineActual(bl.id);
+        const over=actual>(bl.planned||0)&&(bl.planned||0)>0;
+        const diffVal=actual-(bl.planned||0);
+        const diffColor=over?'var(--r)':'var(--g)';
+        const diffSign=diffVal>0?'+':'';
+        return`<div class="mob-bl-card" id="mbl-${bl.id}">
+          <div class="mob-bl-card-top">
+            <div class="mob-bl-card-desc">
+              <input type="text" value="${esc(bl.description)}" placeholder="Descripción…" oninput="setBL(${bl.id},'description',this.value)">
+            </div>
+            <button class="btn btn-del" style="flex-shrink:0" onclick="delBL(${bl.id})">✕</button>
+          </div>
+          <div class="mob-bl-card-nums">
+            <div class="mob-bl-card-num">
+              <label>Planificado</label>
+              <input type="number" value="${bl.planned||''}" placeholder="0" oninput="setBL(${bl.id},'planned',this.value)">
+            </div>
+            <div class="mob-bl-card-num">
+              <label>Real</label>
+              <input type="number" value="${actual||''}" placeholder="0" readonly style="background:var(--bg,#f7fafc);color:${over?'var(--r)':'var(--text)'}">
+            </div>
+          </div>
+          <div class="mob-bl-card-foot">
+            <span style="font-size:.72rem;font-weight:700;color:${diffColor}">${diffSign}${fmt(Math.abs(diffVal))}</span>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.75rem;color:var(--muted)">
+              <input type="checkbox" ${bl.paid?'checked':''} onchange="togBLPaid(${bl.id})"> Pagado
+            </label>
+          </div>
+        </div>`;
+      }).join('');
+      tw.parentNode.insertBefore(cardsDiv,tw.nextSibling);
+    }
+    renderBLFootMobile(cat,key);
+  }
 }
 function renderBLFoot(cat){
   const m=curM();if(!m)return;
@@ -2398,6 +2610,25 @@ function renderBLFoot(cat){
   const tPusd=viewMode==='USD'&&tP>0?`<div class="usd-val">${fmtU(tP/rate)}</div>`:'';
   const tAusd=viewMode==='USD'&&tA>0?`<div class="usd-val">${fmtU(tA/rate)}</div>`:'';
   document.getElementById('foot'+key).innerHTML=`<tr><td>TOTAL</td><td></td><td style="text-align:right">${fmt(tP)}${tPusd}</td><td style="text-align:right">${fmt(tA)}${tAusd}</td><td>${dif(tP,tA,'exp')}</td><td></td><td></td><td></td></tr>`;
+}
+function renderBLFootMobile(cat,key){
+  const m=curM();if(!m)return;
+  const rows=m.budgetLines.filter(b=>b.cat===cat);
+  const tP=rows.reduce((s,b)=>s+(b.planned||0),0);
+  const tA=rows.reduce((s,b)=>s+lineActual(b.id),0);
+  const over=tA>tP&&tP>0;
+  const diffVal=tA-tP;
+  const diffColor=over?'var(--r)':'var(--g)';
+  const diffSign=diffVal>0?'+':'';
+  // Find the mob-bl-cards div and inject a summary line after it
+  const cardsDiv=document.querySelector('.mob-bl-cards[data-cat="'+cat+'"]');
+  if(!cardsDiv)return;
+  let footDiv=cardsDiv.nextElementSibling;
+  if(footDiv&&footDiv.classList.contains('mob-bl-foot-sum'))footDiv.remove();
+  const fd=document.createElement('div');
+  fd.className='mob-bl-foot-sum';
+  fd.innerHTML=`TOTAL ${cat.toUpperCase()}: Plan <strong>${fmt(tP)}</strong> · Real <strong style="color:${over?'var(--r)':'inherit'}">${fmt(tA)}</strong> <span style="color:${diffColor};font-weight:700">(${diffSign}${fmt(Math.abs(diffVal))})</span>`;
+  cardsDiv.parentNode.insertBefore(fd,cardsDiv.nextSibling);
 }
 function renderCatTot(cat){
   const c=compute();if(!c)return;const m=curM();if(!m)return;
@@ -2931,12 +3162,22 @@ function renderDaily(){
   const budget=c.eP||1;
   const pct=Math.min(100,monthTotal/budget*100);
   const pcol=pct>90?'danger':pct>70?'warn':'';
-  document.getElementById('dailySummary').innerHTML=`
-    <div class="ds-item"><div class="ds-lbl">Hoy gastos</div><div class="ds-val">${fmt(todayAmt)}</div><div class="ds-sub">${todayInc>0?`+${fmt(todayInc)} ingresado`:expEntries.filter(e=>e.date===today).length+' registro'+(expEntries.filter(e=>e.date===today).length!==1?'s':'')}</div></div>
-    <div class="ds-item" style="flex:2"><div class="ds-lbl">Gastos del mes — ${m.label}</div><div class="ds-val">${fmt(monthTotal)}</div><div class="ds-sub">${expEntries.length} registros${incEntries.length?` · 💰 ${fmt(incEntries.reduce((s,e)=>s+e.amount,0))} ingresados`:''} · ${pct.toFixed(0)}% del presupuesto</div><div class="ds-prog"><div class="ds-prog-fill ${pcol}" style="width:${pct}%"></div></div></div>
-    <div class="ds-item"><div class="ds-lbl">🏠 Necesidades</div><div class="ds-val">${fmt(c.exp.needs.actual)}</div><div class="ds-sub">de ${fmt(c.exp.needs.target)} (tope)</div></div>
-    <div class="ds-item"><div class="ds-lbl">🎉 Discrecional</div><div class="ds-val">${fmt(c.exp.wants.actual)}</div><div class="ds-sub">de ${fmt(c.exp.wants.target)} (tope)</div></div>
-    <div class="ds-item"><div class="ds-lbl">💎 Ahorro/Inv.</div><div class="ds-val">${fmt(c.exp.savings.actual)}</div><div class="ds-sub">de ${fmt(c.exp.savings.target)} (meta)</div></div>`;
+  if(isMobile()){
+    document.getElementById('dailySummary').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%">
+      <div class="ds-item"><div class="ds-lbl">Hoy gastos</div><div class="ds-val">${fmt(todayAmt)}</div><div class="ds-sub">${todayInc>0?`+${fmt(todayInc)} ingresado`:expEntries.filter(e=>e.date===today).length+' reg.'}</div></div>
+      ${todayInc>0?`<div class="ds-item"><div class="ds-lbl">Hoy ingresos</div><div class="ds-val">${fmt(todayInc)}</div><div class="ds-sub">ingresado hoy</div></div>`:`<div class="ds-item"><div class="ds-lbl">🏠 Necesidades</div><div class="ds-val">${fmt(c.exp.needs.actual)}</div><div class="ds-sub">de ${fmt(c.exp.needs.target)}</div></div>`}
+      <div class="ds-item" style="grid-column:1/-1"><div class="ds-lbl">Gastos del mes — ${m.label}</div><div class="ds-val">${fmt(monthTotal)}</div><div class="ds-sub">${expEntries.length} reg. · ${pct.toFixed(0)}% del presupuesto</div><div class="ds-prog"><div class="ds-prog-fill ${pcol}" style="width:${pct}%"></div></div></div>
+      <div class="ds-item"><div class="ds-lbl">🎉 Discrecional</div><div class="ds-val">${fmt(c.exp.wants.actual)}</div><div class="ds-sub">de ${fmt(c.exp.wants.target)}</div></div>
+      <div class="ds-item"><div class="ds-lbl">💎 Ahorro/Inv.</div><div class="ds-val">${fmt(c.exp.savings.actual)}</div><div class="ds-sub">de ${fmt(c.exp.savings.target)}</div></div>
+    </div>`;
+  } else {
+    document.getElementById('dailySummary').innerHTML=`
+      <div class="ds-item"><div class="ds-lbl">Hoy gastos</div><div class="ds-val">${fmt(todayAmt)}</div><div class="ds-sub">${todayInc>0?`+${fmt(todayInc)} ingresado`:expEntries.filter(e=>e.date===today).length+' registro'+(expEntries.filter(e=>e.date===today).length!==1?'s':'')}</div></div>
+      <div class="ds-item" style="flex:2"><div class="ds-lbl">Gastos del mes — ${m.label}</div><div class="ds-val">${fmt(monthTotal)}</div><div class="ds-sub">${expEntries.length} registros${incEntries.length?` · 💰 ${fmt(incEntries.reduce((s,e)=>s+e.amount,0))} ingresados`:''} · ${pct.toFixed(0)}% del presupuesto</div><div class="ds-prog"><div class="ds-prog-fill ${pcol}" style="width:${pct}%"></div></div></div>
+      <div class="ds-item"><div class="ds-lbl">🏠 Necesidades</div><div class="ds-val">${fmt(c.exp.needs.actual)}</div><div class="ds-sub">de ${fmt(c.exp.needs.target)} (tope)</div></div>
+      <div class="ds-item"><div class="ds-lbl">🎉 Discrecional</div><div class="ds-val">${fmt(c.exp.wants.actual)}</div><div class="ds-sub">de ${fmt(c.exp.wants.target)} (tope)</div></div>
+      <div class="ds-item"><div class="ds-lbl">💎 Ahorro/Inv.</div><div class="ds-val">${fmt(c.exp.savings.actual)}</div><div class="ds-sub">de ${fmt(c.exp.savings.target)} (meta)</div></div>`;
+  }
 
   // Daily cumulative chart
   const daysInMonth=new Date(parseInt(mk.split('-')[0]),parseInt(mk.split('-')[1]),0).getDate();
@@ -3811,14 +4052,14 @@ function renderAIPreviewCards(m){
     cardsEl=document.createElement('div');
     cardsEl.id='aiCardsWrapper';
     const results=document.getElementById('aiResults');
-    // Insert before the overflow-x table wrapper
-    const tableWrap=results.querySelector('div[style*="overflow-x"]');
+    // Insert before the table wrapper
+    const tableWrap=document.getElementById('aiTableWrap');
     if(tableWrap) tableWrap.style.display='none';
     results.insertBefore(cardsEl, results.querySelector('div[style*="justify-content:flex-end"]'));
   }
   cardsEl.style.display='block';
   // Hide table
-  const tableWrap=document.querySelector('#aiResults div[style*="overflow-x"]');
+  const tableWrap=document.getElementById('aiTableWrap');
   if(tableWrap) tableWrap.style.display='none';
 
   cardsEl.innerHTML=aiRows.map((r,i)=>{
@@ -4606,11 +4847,21 @@ function renderDeudas(){
         </div>`:''}
       ${historial}
       <div class="deuda-actions">
-        ${!saldada?`
+        ${!saldada?isMobile()?`
+          <button class="btn btn-g" onclick="abrirPagoModal(${d.id})" style="font-size:.82rem;padding:8px 16px;flex:1">💵 Pagar</button>
+          <button class="btn" onclick="(function(el){el.closest('.deuda-card').querySelector('.deuda-more-actions').classList.toggle('open')})(this)" style="background:#e2e8f0;color:var(--text);font-size:.82rem;padding:8px 12px">⋯</button>
+          <div class="deuda-more-actions" style="width:100%">
+            <button class="btn" onclick="saldarDeuda(${d.id})" style="background:#c6f6d5;color:#276749;border:none;font-size:.75rem;padding:5px 12px">✅ Saldar todo</button>
+            <button class="btn btn-del" onclick="delDeuda(${d.id})">🗑</button>
+          </div>
+        `:`
           <button class="btn btn-g" onclick="abrirPagoModal(${d.id})" style="font-size:.75rem;padding:5px 12px">💵 Registrar pago</button>
           <button class="btn" onclick="saldarDeuda(${d.id})" style="background:#c6f6d5;color:#276749;border:none;font-size:.75rem;padding:5px 12px">✅ Saldar todo</button>
-        `:`<button class="btn" onclick="reabrirDeuda(${d.id})" style="background:#e2e8f0;color:var(--text);font-size:.75rem;padding:5px 10px">↩ Reabrir</button>`}
-        <button class="btn btn-del" onclick="delDeuda(${d.id})">🗑</button>
+          <button class="btn btn-del" onclick="delDeuda(${d.id})">🗑</button>
+        `:`
+          <button class="btn" onclick="reabrirDeuda(${d.id})" style="background:#e2e8f0;color:var(--text);font-size:.75rem;padding:5px 10px">↩ Reabrir</button>
+          <button class="btn btn-del" onclick="delDeuda(${d.id})">🗑</button>
+        `}
       </div>
     </div>`;
   }).join('');
