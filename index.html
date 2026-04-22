@@ -314,6 +314,46 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 .ai-preview-tbl input,.ai-preview-tbl select{border:1.5px solid var(--bdr);border-radius:6px;padding:4px 7px;font-size:.79rem;background:#fff;width:100%;font-family:inherit}
 .ai-preview-tbl input:focus,.ai-preview-tbl select:focus{outline:none;border-color:var(--pri)}
 .ai-preview-tbl .del-row{background:none;border:none;cursor:pointer;color:var(--r);font-size:.95rem;padding:2px 5px}
+/* AI card view (mobile) */
+.ai-card{background:var(--card);border:1.5px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.ai-card-row{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;margin-bottom:8px}
+.ai-card-field{display:flex;flex-direction:column;gap:3px;flex:1;min-width:120px}
+.ai-card-field.sm{min-width:80px;flex:0 0 90px}
+.ai-card-field label{font-size:.62rem;font-weight:700;color:var(--muted);text-transform:uppercase}
+.ai-card-field input,.ai-card-field select{border:1.5px solid var(--bdr);border-radius:8px;padding:8px 10px;font-size:.85rem;background:#fff;width:100%;font-family:inherit;box-sizing:border-box}
+.ai-card-actions{display:flex;gap:6px;align-items:center;justify-content:space-between;margin-top:4px}
+.ai-split-btn{border:1.5px solid var(--bdr);border-radius:20px;background:transparent;font-size:.75rem;font-weight:700;padding:5px 12px;cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;color:var(--muted)}
+.ai-split-btn.active{border-color:#3182ce;background:#ebf8ff;color:#2b6cb0}
+/* Split panel */
+.ai-split-panel{background:#f0f7ff;border:1.5px solid #90cdf4;border-radius:10px;padding:12px 14px;margin-top:8px}
+.ai-split-panel h5{font-size:.76rem;font-weight:800;color:#2b6cb0;margin:0 0 10px}
+.contact-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.contact-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:.76rem;font-weight:700;cursor:pointer;border:1.5px solid #bee3f8;background:#ebf8ff;color:#2b6cb0;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.contact-chip.selected{background:#2b6cb0;color:#fff;border-color:#2b6cb0}
+.contact-chip .cc-remove{background:none;border:none;cursor:pointer;font-size:.7rem;color:inherit;padding:0;opacity:.7;margin-left:2px}
+.split-payer-row{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap}
+.split-payer-btn{flex:1;min-width:80px;padding:7px;border:1.5px solid var(--bdr);border-radius:8px;background:transparent;font-size:.76rem;font-weight:700;cursor:pointer;text-align:center;transition:all .15s;color:var(--muted)}
+.split-payer-btn.active{border-color:#3182ce;background:#2b6cb0;color:#fff}
+.split-mode-toggle{display:flex;gap:4px;margin-bottom:8px}
+.split-mode-btn{flex:1;padding:5px;border:1.5px solid var(--bdr);border-radius:8px;background:transparent;font-size:.72rem;font-weight:700;cursor:pointer;color:var(--muted);transition:all .15s}
+.split-mode-btn.active{border-color:#6b46c1;background:#6b46c1;color:#fff}
+.split-custom-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:.8rem}
+.split-custom-row input{width:90px;border:1.5px solid var(--bdr);border-radius:6px;padding:5px 8px;font-size:.8rem;font-family:inherit}
+.split-preview-box{background:#fff;border-radius:8px;padding:9px 12px;font-size:.78rem;margin-top:8px;border:1px solid #bee3f8}
+.split-preview-box .sp-line{display:flex;justify-content:space-between;padding:2px 0;font-weight:600}
+.split-preview-box .sp-line.debt{color:#c05621}
+.split-preview-box .sp-line.mine{color:#2b6cb0}
+.ai-contact-add{display:flex;gap:6px;margin-bottom:8px}
+.ai-contact-add input{flex:1;border:1.5px solid var(--bdr);border-radius:8px;padding:7px 10px;font-size:.82rem;font-family:inherit}
+.ai-contact-add button{border:none;border-radius:8px;background:#2b6cb0;color:#fff;padding:7px 12px;font-size:.8rem;font-weight:700;cursor:pointer;white-space:nowrap}
+/* Dark mode for split */
+[data-theme="dark"] .ai-split-panel{background:#0c1d2e;border-color:#2c5282}
+[data-theme="dark"] .ai-split-panel h5{color:#63b3ed}
+[data-theme="dark"] .contact-chip{background:#1e3a5f;color:#90cdf4;border-color:#2c5282}
+[data-theme="dark"] .contact-chip.selected{background:#3182ce;color:#fff}
+[data-theme="dark"] .split-preview-box{background:#0f172a;border-color:#2c5282}
+[data-theme="dark"] .ai-card{background:var(--card);border-color:#334155}
+[data-theme="dark"] .ai-card-field input,[data-theme="dark"] .ai-card-field select{background:#0f172a;color:var(--text);border-color:#334155}
 .ai-status{font-size:.82rem;padding:10px 14px;border-radius:8px;margin-bottom:12px}
 .ai-status.loading{background:#ebf8ff;color:#2b6cb0}
 .ai-status.error{background:#fff5f5;color:#c53030}
@@ -496,8 +536,20 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   .settings-row .field{min-width:0;width:100%}
 
   /* ── AI modal ── */
-  .ai-modal{padding:18px 14px}
-  .ai-overlay{padding:10px 8px}
+  .ai-modal{padding:16px 12px;border-radius:12px}
+  .ai-overlay{padding:6px 4px;align-items:flex-start}
+  /* Hide table on mobile, show cards instead */
+  #aiResults div[style*="overflow-x"]{display:none!important}
+  /* Make the modal full-screen on mobile */
+  .ai-modal{max-width:100%;width:100%;border-radius:12px 12px 0 0;min-height:50vh}
+  .ai-overlay{align-items:flex-end;padding:0}
+  /* AI card field inputs already 16px, but ensure */
+  .ai-card-field input,.ai-card-field select{font-size:16px!important}
+  /* Split panel on mobile */
+  .ai-split-panel{padding:10px 12px}
+  .split-payer-row{gap:4px}
+  .split-payer-btn{font-size:.72rem;padding:6px 4px}
+  .contact-chip{font-size:.72rem;padding:5px 9px}
 
   /* ── Goal stats ── */
   .goal-stats{grid-template-columns:1fr 1fr!important}
@@ -630,7 +682,12 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
 .deuda-prog-fill{height:100%;border-radius:3px;background:var(--g);transition:width .4s}
 .deuda-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
 .pago-chip{display:flex;align-items:center;gap:4px;background:#f0fff4;border-radius:6px;padding:3px 9px;font-size:.72rem;font-weight:600;color:#276749;border:1px solid #9ae6b4}
-@media(max-width:640px){.deuda-kpi-row{grid-template-columns:1fr 1fr!important}}
+@media(max-width:640px){
+  .deuda-kpi-row{grid-template-columns:1fr 1fr!important}
+  #deudaFormGrid{grid-template-columns:1fr 1fr!important}
+  #deudaFormGrid .field:nth-child(5){grid-column:1/-1} /* motivo: full width */
+  #deudaFormGrid button{grid-column:1/-1;width:100%;justify-content:center;padding:12px}
+}
 
 /* ══════════════════ FACTURACIÓN ══════════════════ */
 .factura-card{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);border-left:4px solid var(--bdr)}
@@ -1162,11 +1219,19 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
   <!-- KPIs -->
   <div class="deuda-kpi-row" id="deudaKpiRow"></div>
 
+  <!-- Panel de contactos guardados -->
+  <div id="contactsPanel" style="margin-bottom:14px;display:none">
+    <div style="font-size:.78rem;font-weight:700;color:var(--muted);margin-bottom:6px">📋 Contactos guardados (usados en splits)</div>
+    <div id="contactsChipList" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+  </div>
+
   <!-- Formulario nueva deuda -->
   <div class="card" style="margin-bottom:16px">
     <div class="ct">➕ Registrar deuda</div>
+    <!-- Contactos rápidos para rellenar nombre -->
+    <div id="deudaQuickContacts" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:10px;align-items:flex-end" id="deudaFormGrid">
-      <div class="field"><label>Nombre</label><input type="text" id="dNombre" placeholder="Ej: Nico, Tomi…"></div>
+      <div class="field"><label>Nombre</label><input type="text" id="dNombre" placeholder="Ej: Nico, Tomi…" oninput="filterDeudaContacts(this.value)"></div>
       <div class="field"><label>Tipo</label>
         <select id="dTipo">
           <option value="me_deben">💰 Me deben a mí</option>
@@ -1465,6 +1530,7 @@ input[type=checkbox].cb{width:16px;height:16px;cursor:pointer;accent-color:var(-
               <th style="width:90px">Monto ($)</th>
               <th style="width:130px">Categoría</th>
               <th style="width:170px">Línea presupuesto</th>
+              <th style="width:44px" title="Dividir">👥</th>
               <th style="width:32px"></th>
             </tr>
           </thead>
@@ -3546,6 +3612,9 @@ function openAI(){
   document.getElementById('btnAnalyze').disabled=true;
   document.getElementById('aiHint').textContent='Seleccioná una imagen para continuar';
   document.getElementById('aiFileInput').value='';
+  // Reset cards wrapper
+  const cw=document.getElementById('aiCardsWrapper');
+  if(cw)cw.remove();
 }
 
 function closeAI(){document.getElementById('aiOverlay').style.display='none';}
@@ -3676,39 +3745,266 @@ function showAIStatus(msg,type){
   el.textContent=msg;el.className='ai-status '+type;el.style.display='block';
 }
 
+function isMobile(){return window.innerWidth<=640;}
+
 function renderAIPreview(){
   const m=curM();
+  if(isMobile()){
+    renderAIPreviewCards(m);
+  } else {
+    renderAIPreviewTable(m);
+  }
+  updateConfirmCount();
+}
+
+function srcBadgeHtml(r){
+  return r._acSource==='aprendido'
+    ? `<span style="font-size:.6rem;background:#c6f6d5;color:#276749;border-radius:4px;padding:1px 5px">✓ aprendido</span>`
+    : r._acSource==='historial'
+    ? `<span style="font-size:.6rem;background:#bee3f8;color:#2b6cb0;border-radius:4px;padding:1px 5px">📋 historial</span>`
+    : r._acSource==='reglas'
+    ? `<span style="font-size:.6rem;background:#fefcbf;color:#744210;border-radius:4px;padding:1px 5px">🤖 reglas</span>`
+    : `<span style="font-size:.6rem;background:#e2e8f0;color:#718096;border-radius:4px;padding:1px 5px">✨ IA</span>`;
+}
+
+function lineOptsHtml(m, r){
+  const lines=m?m.budgetLines.filter(b=>b.cat===r.cat):[];
+  return`<option value="">Sin línea</option>${lines.map(b=>`<option value="${b.id}" ${b.id==r.budgetLineId?'selected':''}>${esc(b.description.substring(0,22))}</option>`).join('')}`;
+}
+
+function renderAIPreviewTable(m){
   const tbody=document.getElementById('aiPreviewBody');
   tbody.innerHTML=aiRows.map((r,i)=>{
-    const linesForCat=m?m.budgetLines.filter(b=>b.cat===r.cat):[];
-    const lineOpts=`<option value="">Sin línea</option>${linesForCat.map(b=>`<option value="${b.id}" ${b.id==r.budgetLineId?'selected':''}>${esc(b.description.substring(0,24))}</option>`).join('')}`;
-    // Source badge
-    const srcBadge = r._acSource==='aprendido'
-      ? `<span style="font-size:.6rem;background:#c6f6d5;color:#276749;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">✓ aprendido</span>`
-      : r._acSource==='historial'
-      ? `<span style="font-size:.6rem;background:#bee3f8;color:#2b6cb0;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">📋 historial</span>`
-      : r._acSource==='reglas'
-      ? `<span style="font-size:.6rem;background:#fefcbf;color:#744210;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">🤖 reglas</span>`
-      : `<span style="font-size:.6rem;background:#e2e8f0;color:#718096;border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">✨ IA</span>`;
+    const sp=r._split;
+    const splitActive=sp&&sp.people&&sp.people.length>0;
     return`<tr id="air-${i}">
       <td><input type="date" value="${r.date}" onchange="aiRows[${i}].date=this.value;updateConfirmCount()"></td>
       <td>
         <input type="text" value="${esc(r.description)}" onchange="aiRows[${i}].description=this.value;aiRecat(${i})">
-        ${srcBadge}
+        ${srcBadgeHtml(r)}
       </td>
-      <td><input type="number" value="${r.amount}" min="0" onchange="aiRows[${i}].amount=parseFloat(this.value)||0"></td>
+      <td><input type="number" value="${r.amount}" min="0" onchange="aiRows[${i}].amount=parseFloat(this.value)||0;aiUpdateSplitPreview(${i})"></td>
       <td><select onchange="aiRows[${i}].cat=this.value;aiRows[${i}].budgetLineId='';renderAIPreview()">
         <option value="needs" ${r.cat==='needs'?'selected':''}>🏠 Necesidades</option>
         <option value="wants" ${r.cat==='wants'?'selected':''}>🎉 Discrecional</option>
         <option value="savings" ${r.cat==='savings'?'selected':''}>💎 Ahorro</option>
       </select></td>
       <td><select onchange="aiRows[${i}].budgetLineId=this.value?parseInt(this.value):''">
-        ${lineOpts}
+        ${lineOptsHtml(m,r)}
       </select></td>
+      <td>
+        <button class="ai-split-btn ${splitActive?'active':''}" onclick="aiToggleSplit(${i})" title="Dividir gasto">👥${splitActive?' ÷':''}</button>
+      </td>
       <td><button class="del-row" onclick="aiRows.splice(${i},1);renderAIPreview()" title="Eliminar">✕</button></td>
-    </tr>`;
+    </tr>
+    ${splitActive?`<tr><td colspan="7" style="padding:0 8px 12px">${aiSplitPanelHtml(i)}</td></tr>`:''}`;
   }).join('');
-  updateConfirmCount();
+}
+
+function renderAIPreviewCards(m){
+  const container=document.getElementById('aiPreviewBody');
+  // On mobile, wrap in a div instead of tbody rows
+  const wrapper=document.getElementById('aiCardsWrapper');
+  // Use the aiResults div to inject cards
+  let cardsEl=document.getElementById('aiCardsWrapper');
+  if(!cardsEl){
+    cardsEl=document.createElement('div');
+    cardsEl.id='aiCardsWrapper';
+    const results=document.getElementById('aiResults');
+    // Insert before the overflow-x table wrapper
+    const tableWrap=results.querySelector('div[style*="overflow-x"]');
+    if(tableWrap) tableWrap.style.display='none';
+    results.insertBefore(cardsEl, results.querySelector('div[style*="justify-content:flex-end"]'));
+  }
+  cardsEl.style.display='block';
+  // Hide table
+  const tableWrap=document.querySelector('#aiResults div[style*="overflow-x"]');
+  if(tableWrap) tableWrap.style.display='none';
+
+  cardsEl.innerHTML=aiRows.map((r,i)=>{
+    const sp=r._split;
+    const splitActive=sp&&sp.people&&sp.people.length>0;
+    return`<div class="ai-card" id="aic-${i}">
+      <div class="ai-card-row">
+        <div class="ai-card-field sm">
+          <label>Fecha</label>
+          <input type="date" value="${r.date}" onchange="aiRows[${i}].date=this.value;updateConfirmCount()">
+        </div>
+        <div class="ai-card-field">
+          <label>Descripción ${srcBadgeHtml(r)}</label>
+          <input type="text" value="${esc(r.description)}" onchange="aiRows[${i}].description=this.value;aiRecat(${i})">
+        </div>
+        <div class="ai-card-field sm">
+          <label>Monto $</label>
+          <input type="number" value="${r.amount}" min="0" onchange="aiRows[${i}].amount=parseFloat(this.value)||0;aiUpdateSplitPreview(${i})">
+        </div>
+      </div>
+      <div class="ai-card-row">
+        <div class="ai-card-field">
+          <label>Categoría</label>
+          <select onchange="aiRows[${i}].cat=this.value;aiRows[${i}].budgetLineId='';renderAIPreview()">
+            <option value="needs" ${r.cat==='needs'?'selected':''}>🏠 Necesidades</option>
+            <option value="wants" ${r.cat==='wants'?'selected':''}>🎉 Discrecional</option>
+            <option value="savings" ${r.cat==='savings'?'selected':''}>💎 Ahorro</option>
+          </select>
+        </div>
+        <div class="ai-card-field">
+          <label>Línea presupuesto</label>
+          <select onchange="aiRows[${i}].budgetLineId=this.value?parseInt(this.value):''">
+            ${lineOptsHtml(m,r)}
+          </select>
+        </div>
+      </div>
+      <div class="ai-card-actions">
+        <button class="ai-split-btn ${splitActive?'active':''}" onclick="aiToggleSplit(${i})">
+          👥 ${splitActive?'Dividido ✓':'Dividir gasto'}
+        </button>
+        <button style="background:none;border:none;cursor:pointer;color:var(--r);font-size:.85rem;font-weight:700;padding:5px 8px" onclick="aiRows.splice(${i},1);renderAIPreview()">✕ Quitar</button>
+      </div>
+      ${splitActive?`<div style="margin-top:8px">${aiSplitPanelHtml(i)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function aiSplitPanelHtml(i){
+  const r=aiRows[i];
+  if(!r._split) r._split={people:[],payer:'me',mode:'equal',customAmounts:{}};
+  const sp=r._split;
+  const contacts=(S.contacts||[]);
+  const total=parseFloat(r.amount)||0;
+  const allPeople=['Yo',...sp.people];
+  const n=allPeople.length;
+  const perHead=n>0?total/n:0;
+
+  // Payer options
+  const payerOpts=allPeople.map(p=>`<button class="split-payer-btn${sp.payer===(p==='Yo'?'me':p)?' active':''}" onclick="aiSetPayer(${i},'${p==='Yo'?'me':p}')">${p}</button>`).join('');
+
+  // Custom amounts
+  let customHtml='';
+  if(sp.mode==='custom'){
+    customHtml=`<div style="margin:6px 0">${allPeople.map(p=>{
+      const key=p==='Yo'?'me':p;
+      const val=sp.customAmounts[key]||'';
+      return`<div class="split-custom-row">
+        <span style="flex:1;font-weight:700">${p}</span>
+        <input type="number" placeholder="0" value="${val}" min="0"
+          onchange="aiSetCustomAmt(${i},'${key}',this.value)">
+        <span style="color:var(--muted)">ARS</span>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // Preview box
+  let previewHtml='';
+  if(sp.people.length>0){
+    const myShare=sp.mode==='equal'?perHead:(sp.customAmounts['me']||0);
+    const iPayAll=sp.payer==='me';
+    const lines=sp.people.map(p=>{
+      const share=sp.mode==='equal'?perHead:(sp.customAmounts[p]||0);
+      return iPayAll
+        ?`<div class="sp-line debt">📲 ${p} te debe: <strong>${fmt(share)}</strong></div>`
+        :`<div class="sp-line">✓ ${p} pagó por vos: <strong>${fmt(share)}</strong></div>`;
+    }).join('');
+    const myLbl=iPayAll?`Tu gasto real: <strong>${fmt(myShare)}</strong> (del total ${fmt(total)})`:`Tu deuda con ${sp.payer}: <strong>${fmt(myShare)}</strong>`;
+    previewHtml=`<div class="split-preview-box">
+      <div class="sp-line mine">💰 ${myLbl}</div>
+      ${lines}
+    </div>`;
+  }
+
+  // Saved contacts chips (to add to this split)
+  const savedChips=contacts.filter(c=>!sp.people.includes(c)).map(c=>
+    `<span class="contact-chip" onclick="aiAddSplitPerson(${i},'${c.replace(/'/g,"\\'")}')">+ ${c}</span>`
+  ).join('');
+
+  // Selected people chips
+  const selectedChips=sp.people.map((p,pi)=>
+    `<span class="contact-chip selected">${p} <button class="cc-remove" onclick="aiRemoveSplitPerson(${i},${pi})">✕</button></span>`
+  ).join('');
+
+  return`<div class="ai-split-panel" id="asp-${i}">
+    <h5>👥 Dividir gasto</h5>
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:8px">¿Con quién lo compartís?</div>
+    ${savedChips||selectedChips?`<div class="contact-chips">${selectedChips}${savedChips}</div>`:''}
+    <div class="ai-contact-add">
+      <input type="text" id="aiNewContact-${i}" placeholder="Nombre (ej: Juan)" onkeydown="if(event.key==='Enter')aiAddNewContact(${i})">
+      <button onclick="aiAddNewContact(${i})">+ Agregar</button>
+    </div>
+    ${sp.people.length>0?`
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);margin:8px 0 4px">¿Quién pagó?</div>
+    <div class="split-payer-row">${payerOpts}</div>
+    <div style="font-size:.72rem;font-weight:700;color:var(--muted);margin:8px 0 4px">División</div>
+    <div class="split-mode-toggle">
+      <button class="split-mode-btn${sp.mode==='equal'?' active':''}" onclick="aiSetSplitMode(${i},'equal')">⚖️ En partes iguales</button>
+      <button class="split-mode-btn${sp.mode==='custom'?' active':''}" onclick="aiSetSplitMode(${i},'custom')">✏️ Personalizada</button>
+    </div>
+    ${customHtml}
+    ${previewHtml}
+    `:''}
+  </div>`;
+}
+
+// ── AI Split helpers ──────────────────────────
+function aiToggleSplit(i){
+  if(!aiRows[i]._split||!aiRows[i]._split.people||aiRows[i]._split.people.length===0){
+    aiRows[i]._split={people:[],payer:'me',mode:'equal',customAmounts:{}};
+  } else {
+    aiRows[i]._split=null;
+  }
+  renderAIPreview();
+}
+
+function aiAddSplitPerson(i, name){
+  if(!aiRows[i]._split) aiRows[i]._split={people:[],payer:'me',mode:'equal',customAmounts:{}};
+  if(!aiRows[i]._split.people.includes(name)) aiRows[i]._split.people.push(name);
+  renderAIPreview();
+}
+
+function aiRemoveSplitPerson(i, pi){
+  if(aiRows[i]._split){
+    const p=aiRows[i]._split.people[pi];
+    aiRows[i]._split.people.splice(pi,1);
+    delete aiRows[i]._split.customAmounts[p];
+    if(aiRows[i]._split.payer===p) aiRows[i]._split.payer='me';
+  }
+  renderAIPreview();
+}
+
+function aiAddNewContact(i){
+  const inp=document.getElementById(`aiNewContact-${i}`);
+  if(!inp) return;
+  const names=inp.value.split(',').map(n=>n.trim()).filter(n=>n);
+  names.forEach(name=>{
+    if(!aiRows[i]._split) aiRows[i]._split={people:[],payer:'me',mode:'equal',customAmounts:{}};
+    if(!aiRows[i]._split.people.includes(name)) aiRows[i]._split.people.push(name);
+    // Guardar contacto persistente
+    if(!S.contacts) S.contacts=[];
+    if(!S.contacts.includes(name)) S.contacts.push(name);
+  });
+  saveS();
+  renderAIPreview();
+}
+
+function aiSetPayer(i, payer){
+  if(aiRows[i]._split) aiRows[i]._split.payer=payer;
+  renderAIPreview();
+}
+
+function aiSetSplitMode(i, mode){
+  if(aiRows[i]._split) aiRows[i]._split.mode=mode;
+  renderAIPreview();
+}
+
+function aiSetCustomAmt(i, person, val){
+  if(!aiRows[i]._split) return;
+  aiRows[i]._split.customAmounts[person]=parseFloat(val)||0;
+  aiUpdateSplitPreview(i);
+}
+
+function aiUpdateSplitPreview(i){
+  // Lightweight re-render of just the split panel
+  const panelEl=document.getElementById(`asp-${i}`);
+  if(panelEl) panelEl.outerHTML=aiSplitPanelHtml(i);
 }
 
 // Re-run auto-cat when description changes in the AI preview table
@@ -3736,27 +4032,101 @@ function addAIRow(){
 }
 
 function confirmAIImport(){
-  let added=0,skipped=0;
+  if(!S.deudas) S.deudas=[];
+  let added=0,skipped=0,deudasCreadas=0;
+  const rate=getCurrentUSDRate()||1;
+
   aiRows.forEach(r=>{
     if(!r.date){skipped++;return;}
     if(r.amount<=0){skipped++;return;}
     const mk=r.date.substring(0,7);
     if(!S.months[mk]){skipped++;return;}
-    S.dailyEntries.push({
-      id:uid(),date:r.date,monthKey:mk,cat:r.cat,
-      description:r.description||'Importado',
-      amount:r.amount,
-      budgetLineId:r.budgetLineId?parseInt(r.budgetLineId):null,
-      usdRateAtTime:getCurrentUSDRate()
-    });
-    added++;
+
+    const sp=r._split;
+    const hasSplit=sp&&sp.people&&sp.people.length>0;
+
+    if(!hasSplit){
+      // Sin split: registrar normalmente
+      S.dailyEntries.push({
+        id:uid(),date:r.date,monthKey:mk,cat:r.cat,
+        description:r.description||'Importado',
+        amount:r.amount,
+        budgetLineId:r.budgetLineId?parseInt(r.budgetLineId):null,
+        usdRateAtTime:rate
+      });
+      added++;
+    } else {
+      const allPeople=['me',...sp.people];
+      const n=allPeople.length;
+      const iPayAll=sp.payer==='me';
+
+      // Calcular shares
+      const shares={};
+      if(sp.mode==='custom'){
+        allPeople.forEach(p=>shares[p]=parseFloat(sp.customAmounts[p]||0));
+      } else {
+        const perHead=r.amount/n;
+        allPeople.forEach(p=>shares[p]=perHead);
+      }
+
+      const myShare=shares['me']||0;
+
+      if(iPayAll){
+        // Yo pagué todo → registrar el total como gasto mío
+        S.dailyEntries.push({
+          id:uid(),date:r.date,monthKey:mk,cat:r.cat,
+          description:r.description||'Importado',
+          amount:r.amount,
+          budgetLineId:r.budgetLineId?parseInt(r.budgetLineId):null,
+          usdRateAtTime:rate,
+          _split:{people:sp.people,payer:'me',mode:sp.mode}
+        });
+        // Crear deuda ME_DEBEN por cada persona
+        sp.people.forEach(p=>{
+          const share=shares[p]||0;
+          if(share<=0) return;
+          S.deudas.unshift({
+            id:uid(),nombre:p,tipo:'me_deben',
+            montoOriginal:Math.round(share),moneda:'ARS',
+            descripcion:`Compartieron: ${r.description||'gasto'}`,
+            fecha:r.date,estado:'pendiente',pagos:[]
+          });
+          deudasCreadas++;
+        });
+      } else {
+        // Otro pagó → registrar solo mi parte como gasto
+        S.dailyEntries.push({
+          id:uid(),date:r.date,monthKey:mk,cat:r.cat,
+          description:r.description||'Importado',
+          amount:Math.round(myShare),
+          budgetLineId:r.budgetLineId?parseInt(r.budgetLineId):null,
+          usdRateAtTime:rate,
+          _split:{people:sp.people,payer:sp.payer,mode:sp.mode}
+        });
+        // Crear deuda LES_DEBO al que pagó
+        S.deudas.unshift({
+          id:uid(),nombre:sp.payer,tipo:'les_debo',
+          montoOriginal:Math.round(myShare),moneda:'ARS',
+          descripcion:`${sp.payer} pagó: ${r.description||'gasto'}`,
+          fecha:r.date,estado:'pendiente',pagos:[]
+        });
+        deudasCreadas++;
+      }
+      added++;
+    }
   });
+
   saveS();
   closeAI();
   renderDaily();
   if(document.getElementById('pane-budget').classList.contains('active'))renderBudget();
   if(document.getElementById('pane-dash').classList.contains('active'))renderDash();
-  if(added>0)alert(`✅ Se agregaron ${added} gasto${added!==1?'s':''} al log.${skipped>0?` (${skipped} omitido${skipped!==1?'s':''} por datos inválidos)`:''}`);
+  if(document.getElementById('pane-deudas')?.classList.contains('active'))renderDeudas();
+
+  let msg=`✅ Se agregaron ${added} gasto${added!==1?'s':''} al log.`;
+  if(deudasCreadas>0) msg+=`\n💳 ${deudasCreadas} deuda${deudasCreadas!==1?'s':''} creada${deudasCreadas!==1?'s':''} automáticamente en Deudas.`;
+  if(skipped>0) msg+=`\n⚠️ ${skipped} omitido${skipped!==1?'s':''} por datos inválidos.`;
+  if(added>0) alert(msg);
 }
 
 // ═══════════════════════════ CALENDARIO ═══════════════════════════
@@ -4032,6 +4402,9 @@ function addDeuda(){
   const fecha=document.getElementById('dFecha').value;
   if(!nombre||!monto){alert('Completá nombre y monto');return;}
   if(!S.deudas)S.deudas=[];
+  if(!S.contacts)S.contacts=[];
+  // Guardar contacto si es nuevo
+  if(nombre&&!S.contacts.includes(nombre)) S.contacts.push(nombre);
   S.deudas.unshift({
     id:uid(), nombre, tipo, montoOriginal:monto, moneda,
     descripcion:desc, fecha:fecha||new Date().toISOString().split('T')[0],
@@ -4108,8 +4481,47 @@ function delDeuda(id){
   saveS(); renderDeudas();
 }
 
+function renderContactsPanel(){
+  const contacts=S.contacts||[];
+  const panel=document.getElementById('contactsPanel');
+  const chipList=document.getElementById('contactsChipList');
+  const quickContacts=document.getElementById('deudaQuickContacts');
+  if(panel){
+    if(contacts.length){
+      panel.style.display='block';
+      chipList.innerHTML=contacts.map((c,i)=>`
+        <span style="display:inline-flex;align-items:center;gap:4px;background:var(--card);border:1.5px solid var(--bdr);border-radius:20px;padding:4px 10px;font-size:.75rem;font-weight:700;color:var(--text)">
+          👤 ${esc(c)}
+          <button onclick="deleteContact(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.7rem;padding:0;margin-left:3px" title="Borrar contacto">✕</button>
+        </span>`).join('');
+    } else {
+      panel.style.display='none';
+    }
+  }
+  // Quick-select chips en el formulario de deuda
+  if(quickContacts){
+    quickContacts.innerHTML=contacts.length
+      ?contacts.map(c=>`<span class="contact-chip" style="font-size:.72rem;padding:4px 10px" onclick="document.getElementById('dNombre').value='${c.replace(/'/g,"\\'")}'">${c}</span>`).join('')
+      :'';
+  }
+}
+
+function deleteContact(i){
+  if(!S.contacts)return;
+  S.contacts.splice(i,1);
+  saveS();
+  renderContactsPanel();
+}
+
+function filterDeudaContacts(val){
+  // When typing a name, if it's not in contacts and not empty, offer to save it
+  // Just leave as-is — saving happens when they add a split contact in AI
+}
+
 function renderDeudas(){
   if(!S.deudas)S.deudas=[];
+  if(!S.contacts)S.contacts=[];
+  renderContactsPanel();
   const all=S.deudas;
   const rate=getCurrentUSDRate()||1;
   const toARS=d=>d.moneda==='USD'?d.montoOriginal*rate:d.montoOriginal;
@@ -4487,6 +4899,7 @@ async function initApp(){
 
   if(!S.facturas)S.facturas=[];
   if(!S.deudas)S.deudas=[];
+  if(!S.contacts)S.contacts=[]; // contactos persistentes para splits
   initTheme();
   updateMonthBar();
   updateNavRates();
